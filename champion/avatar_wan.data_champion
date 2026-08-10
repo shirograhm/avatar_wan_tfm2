@@ -16,23 +16,23 @@
     "asset/avatar_wan_tfm2/icons/avatar_wan_ult"
   ],
   "stat": {
-    "attack": 80,
-    "magic_power": 20,
-    "hp": 850,
-    "defence": 18,
-    "magic_resistance": 20,
+    "attack": 68,
+    "magic_power": 6,
+    "hp": 810,
+    "defence": 27,
+    "magic_resistance": 22,
     "move_speed": 900,
     "hp_regen": 0,
     "stack": 0,
     "crit_chance": 0
   },
   "growth": {
-    "attack": 6,
-    "magic_power": 8,
-    "hp": 95,
+    "attack": 7,
+    "magic_power": 12,
+    "hp": 77,
     "defence": 7,
     "magic_resistance": 3,
-    "move_speed": 9,
+    "move_speed": 2,
     "hp_regen": 0,
     "stack": 0,
     "crit_chance": 0
