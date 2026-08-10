@@ -103,8 +103,14 @@ pub fn proc(
             sim.add_buff(caster, &haste);
         }
 
+        // A share of what he is missing, not a flat amount: worth nothing at
+        // full health and most at the point he is about to die. Read from the
+        // entity rather than `caster_stat`, which only carries max HP.
         Element::Water => {
-            let heal = WATER_HEAL + percent_of(caster_stat.magic_power, WATER_AP_RATIO);
+            let Some((current, max)) = sim.get_entity(caster).map(|entity| entity.hp()) else {
+                return;
+            };
+            let heal = percent_of(max.saturating_sub(current), WATER_MISSING_HP_PERCENT);
             sim.heal(caster, caster, percent_of(heal, scale));
         }
 

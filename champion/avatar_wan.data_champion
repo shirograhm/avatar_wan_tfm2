@@ -159,7 +159,7 @@
     "action_name": "ult",
     "description": "#asset/base/text/champion?description.avatar_wan.ult",
     "duration": 20,
-    "cooltime": 6000,
+    "cooltime": 3600,
     "start_timing": 1,
     "cancelable": false,
     "range": 0,

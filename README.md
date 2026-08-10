@@ -15,8 +15,9 @@ updates and builds with any Rust toolchain — no pinned nightly.
   - **Water:** heals 5 (+5% AP) on hit.
   - **Earth:** 10 (+10% AP) bonus physical damage, splashed to enemies
     within 15,000 units of the target.
-- **Skill 2 (Lv. 3) — Spirit Step.** For 4s, bank 80% of damage taken and
-  gain +20% Movement Speed; when it expires, heal for the banked amount.
+- **Skill 2 (Lv. 3) — Spirit Step.** Dash forward 60,000 units, then for 4s
+  bank 80% of damage taken and gain +20% Movement Speed; when it expires,
+  heal for the banked amount.
 - **Ult — Harmonic Convergence.** 8s behind a 250 (+80% AP) (+8% HP) shield;
   basic attacks also proc his three non-attuned elements at 40% strength.
 

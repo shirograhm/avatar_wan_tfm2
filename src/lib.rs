@@ -42,6 +42,7 @@ fn init(host: &StableHost) -> StableMod {
     }
     reg.add_native_effect(effects::AVATAR_CYCLE, effects::TheAvatarCycle);
     reg.add_native_effect(effects::SPIRIT_STEP, effects::SpiritStep);
+    reg.add_native_effect(effects::SPIRIT_STEP_DASH, effects::SpiritStepDash);
     reg.add_native_effect(effects::HARMONIC_CONVERGENCE, effects::HarmonicConvergence);
     reg.add_native_effect(effects::FIRE_BURN_TICK, effects::FireBurnTick);
 

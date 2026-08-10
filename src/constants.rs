@@ -12,6 +12,10 @@ use crate::element::Element;
 /// Simulation tick rate.
 pub const TICKS_PER_SECOND: f64 = 60.0;
 
+/// Width and height of the match map, used to clamp displacement so a dash
+/// can never push an entity off the world.
+pub const MAP_SIZE: u64 = 960_000;
+
 /// Must match the mod folder name — the loader rejects a mismatch.
 pub const MOD_ID: &str = "avatar_wan_tfm2";
 
@@ -30,24 +34,24 @@ pub const STARTING_ELEMENT: Element = Element::Fire;
 
 // Air: stacking attack speed on hit.
 pub const AIR_STACK_BUFF: &str = "wan_air_stack";
-pub const AIR_ATTACK_SPEED_PERCENT: i32 = 4;
+pub const AIR_ATTACK_SPEED_PERCENT: i32 = 5;
 pub const AIR_DURATION: usize = 2 * 60;
 pub const AIR_MAX_STACKS: usize = 4;
 
-// Water: heal on hit.
-pub const WATER_HEAL: usize = 5;
-pub const WATER_AP_RATIO: usize = 5;
+// Water: heal on hit, as a share of Wan's *missing* health — so it scales
+// with how much trouble he is in rather than with AP.
+pub const WATER_MISSING_HP_PERCENT: usize = 6;
 
 // Earth: bonus physical damage, splashed around the target.
 pub const EARTH_DAMAGE: usize = 10;
-pub const EARTH_AP_RATIO: usize = 10;
+pub const EARTH_AP_RATIO: usize = 45;
 /// Splash radius around the struck target. World units are 1000× the display
-/// scale, so "40 range" in the tooltip is 40,000 here.
-pub const EARTH_RADIUS: u64 = 40_000;
+/// scale, so "50 range" in the tooltip is 50,000 here.
+pub const EARTH_RADIUS: u64 = 50_000;
 
 // Fire: burn over time on hit.
 pub const BURN_DAMAGE: usize = 10;
-pub const BURN_AD_RATIO: usize = 10;
+pub const BURN_AD_RATIO: usize = 15;
 pub const BURN_AP_RATIO: usize = 25;
 /// Six ticks, one every half second, for three seconds total.
 pub const BURN_TICKS: usize = 6;
@@ -66,6 +70,12 @@ pub const STEP_HEAL_PERCENT: usize = 100;
 /// Prefix of the bookkeeping buff. Its name carries the running total and the
 /// last HP reading — see `match_hook`, which is what reads and rewrites it.
 pub const STEP_STORE_PREFIX: &str = "wan_step_store";
+/// The forward dash on cast: how far, and over how many ticks. The dash must
+/// finish inside the action's 12-tick `duration` in the .data_champion, and
+/// one attack range (60,000) is far enough to close on a target without
+/// carrying him past their whole line.
+pub const STEP_DASH_DISTANCE: u64 = 60_000;
+pub const STEP_DASH_TICKS: usize = 8;
 
 // -- ult: Harmonic Convergence --
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
