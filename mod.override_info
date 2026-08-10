@@ -1,0 +1,10 @@
+{
+  "asset/base/text/champion": {
+    "remapping": "asset/avatar_wan_tfm2/text/champion",
+    "type": "merge"
+  },
+  "asset/base/style/champion_view": {
+    "remapping": "asset/avatar_wan_tfm2/style/champion_view",
+    "type": "merge"
+  }
+}

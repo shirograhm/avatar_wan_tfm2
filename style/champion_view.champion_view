@@ -1,0 +1,14 @@
+{
+  "entries": {
+	"test_mod_blitzcrank": {
+      "face": {
+        "x": 0,
+        "y": -35
+      },
+      "center": {
+        "x": 0,
+        "y": -14
+      }
+     }
+    }
+  }

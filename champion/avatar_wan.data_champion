@@ -1,0 +1,196 @@
+{
+  "id": "avatar_wan",
+  "category": "Range",
+  "tags": [
+    "AD",
+    "AP",
+    "Magic",
+    "Range",
+    "Heal"
+  ],
+  "sprite": "asset/avatar_wan_tfm2/aseprite_resources/champions/avatar_wan",
+  "anim_prefix": "",
+  "skill_icons": [
+    "asset/avatar_wan_tfm2/icons/avatar_wan_skill",
+    "asset/avatar_wan_tfm2/icons/avatar_wan_skill2",
+    "asset/avatar_wan_tfm2/icons/avatar_wan_ult"
+  ],
+  "stat": {
+    "attack": 80,
+    "magic_power": 20,
+    "hp": 850,
+    "defence": 18,
+    "magic_resistance": 20,
+    "move_speed": 900,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 8,
+    "hp": 95,
+    "defence": 7,
+    "magic_resistance": 3,
+    "move_speed": 9,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "description": "#asset/base/text/champion?description.avatar_wan.attack",
+    "duration": 24,
+    "cooltime": 60,
+    "start_timing": 14,
+    "cancelable": true,
+    "range": 60000,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "effect": {
+      "type": "SwitchByBuff",
+      "buff_name": "wan_element_air",
+      "effect_buff": {
+        "type": "TargetProjectile",
+        "speed": 5000,
+        "name": "wan_attack_air",
+        "applied_target": "Enemy",
+        "applied_effects": [
+          {
+            "effect": {
+              "type": "Native",
+              "effect_ref": "avatar_wan_attack_hit_air"
+            },
+            "casting_type": "Targeting"
+          }
+        ]
+      },
+      "effect_none": {
+        "type": "SwitchByBuff",
+        "buff_name": "wan_element_water",
+        "effect_buff": {
+          "type": "TargetProjectile",
+          "speed": 5000,
+          "name": "wan_attack_water",
+          "applied_target": "Enemy",
+          "applied_effects": [
+            {
+              "effect": {
+                "type": "Native",
+                "effect_ref": "avatar_wan_attack_hit_water"
+              },
+              "casting_type": "Targeting"
+            }
+          ]
+        },
+        "effect_none": {
+          "type": "SwitchByBuff",
+          "buff_name": "wan_element_earth",
+          "effect_buff": {
+            "type": "TargetProjectile",
+            "speed": 5000,
+            "name": "wan_attack_earth",
+            "applied_target": "Enemy",
+            "applied_effects": [
+              {
+                "effect": {
+                  "type": "Native",
+                  "effect_ref": "avatar_wan_attack_hit_earth"
+                },
+                "casting_type": "Targeting"
+              }
+            ]
+          },
+          "effect_none": {
+            "type": "TargetProjectile",
+            "speed": 5000,
+            "name": "wan_attack_fire",
+            "applied_target": "Enemy",
+            "applied_effects": [
+              {
+                "effect": {
+                  "type": "Native",
+                  "effect_ref": "avatar_wan_attack_hit_fire"
+                },
+                "casting_type": "Targeting"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "skill": {
+    "action_name": "skill1",
+    "description": "#asset/base/text/champion?description.avatar_wan.skill",
+    "duration": 18,
+    "cooltime": 480,
+    "start_timing": 8,
+    "cancelable": false,
+    "range": 0,
+    "casting_type": "None",
+    "casting_target": "AllyOnlySelf",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "Native",
+      "effect_ref": "avatar_wan_avatar_cycle"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "description": "#asset/base/text/champion?description.avatar_wan.skill2",
+    "duration": 12,
+    "cooltime": 840,
+    "start_timing": 1,
+    "cancelable": true,
+    "range": 0,
+    "casting_type": "None",
+    "casting_target": "AllyOnlySelf",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "Native",
+      "effect_ref": "avatar_wan_spirit_step"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "description": "#asset/base/text/champion?description.avatar_wan.ult",
+    "duration": 20,
+    "cooltime": 6000,
+    "start_timing": 1,
+    "cancelable": false,
+    "range": 0,
+    "casting_type": "None",
+    "casting_target": "AllyOnlySelf",
+    "attack_type": "Skill",
+    "effect": {
+      "type": "Native",
+      "effect_ref": "avatar_wan_harmonic_convergence"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Sprite",
+      "name": "wan_attack_air",
+      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_air"
+    },
+    {
+      "type": "Sprite",
+      "name": "wan_attack_water",
+      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_water"
+    },
+    {
+      "type": "Sprite",
+      "name": "wan_attack_earth",
+      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_earth"
+    },
+    {
+      "type": "Sprite",
+      "name": "wan_attack_fire",
+      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_fire"
+    }
+  ]
+}

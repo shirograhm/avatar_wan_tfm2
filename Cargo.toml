@@ -1,0 +1,16 @@
+[package]
+name = "avatar_wan_tfm2"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+# The built DLL must be named after the mod folder: avatar_wan_tfm2.dll
+crate-type = ["cdylib"]
+
+# Stable-ABI mod. Builds with any Rust toolchain and keeps loading across game
+# updates — no pinned nightly and no prebuilt engine rlibs. The SDK crate is
+# plain source; the uploader installs it at ../mod-api-stable if it is missing.
+[dependencies]
+mod-api-stable = { path = "../mod-api-stable" }
+
+[workspace]
