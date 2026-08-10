@@ -42,9 +42,8 @@ pub const WATER_AP_RATIO: usize = 5;
 pub const EARTH_DAMAGE: usize = 10;
 pub const EARTH_AP_RATIO: usize = 10;
 /// Splash radius around the struck target. World units are 1000× the display
-/// scale, so "15 range" in the tooltip is 15,000 here — about 1.5 champion
-/// radii, enough to catch a body or two standing on the target.
-pub const EARTH_RADIUS: u64 = 15_000;
+/// scale, so "40 range" in the tooltip is 40,000 here.
+pub const EARTH_RADIUS: u64 = 40_000;
 
 // Fire: burn over time on hit.
 pub const BURN_DAMAGE: usize = 10;
