@@ -9,7 +9,7 @@ use mod_api_stable::*;
 
 use crate::constants::MAP_SIZE;
 
-/// Enemies of `caster_id` within `radius` of `center_id`, including
+/// Enemies of `caster_id` within `radius` of `center_id`, excluding
 /// `center_id` itself. Collected before any mutation, since an entity view
 /// borrows the sim and dealing damage needs it back.
 pub fn enemies_near(
@@ -28,7 +28,7 @@ pub fn enemies_near(
         .filter_map(|index| sim.entity_at(index))
         .filter(|entity| entity.is_alive() && entity.team() != team)
         .map(|entity| entity.id())
-        .filter(|&id| id == center_id || sim.distance_sq(center_id, id) <= radius_sq)
+        .filter(|&id| id != center_id && sim.distance_sq(center_id, id) <= radius_sq)
         .collect()
 }
 

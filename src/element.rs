@@ -114,8 +114,9 @@ pub fn proc(
             sim.heal(caster, caster, percent_of(heal, scale));
         }
 
-        // Splashes off the struck target rather than hitting it alone, so
-        // Earth is the wave-clear element.
+        // Splashes off the struck target onto everything around it — the
+        // target itself is spared, since the attack already hit it — so Earth
+        // is the wave-clear element.
         Element::Earth => {
             let damage = percent_of(
                 EARTH_DAMAGE + percent_of(caster_stat.magic_power, EARTH_AP_RATIO),
