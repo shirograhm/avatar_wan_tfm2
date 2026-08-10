@@ -40,7 +40,7 @@ pub const AIR_MAX_STACKS: usize = 4;
 
 // Water: heal on hit, as a share of Wan's *missing* health — so it scales
 // with how much trouble he is in rather than with AP.
-pub const WATER_MISSING_HP_PERCENT: usize = 6;
+pub const WATER_MISSING_HP_PERCENT: usize = 4;
 
 // Earth: bonus physical damage, splashed around the target.
 pub const EARTH_DAMAGE: usize = 10;
