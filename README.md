@@ -13,14 +13,14 @@ updates and builds with any Rust toolchain — no pinned nightly.
   - **Fire:** burn for 10 (+10% AD) (+25% AP) magic damage over 3s.
   - **Air:** +4% Attack Speed for 2s on hit, up to 4 stacks.
   - **Water:** heals 5 (+5% AP) on hit.
-  - **Earth:** 40% of the attack's own damage, split physical/magic the same
-    way, splashed to enemies within 50,000 units of the target — the struck
+  - **Earth:** 50% of the attack's own damage, split physical/magic the same
+    way, splashed to enemies within 40,000 units of the target — the struck
     target itself excluded, since the attack already hit it.
 - **Skill 2 (Lv. 3) — Spirit Step.** Dash forward 60,000 units, then for 4s
   bank 80% of damage taken and gain +20% Movement Speed; when it expires,
-  heal for the banked amount.
-- **Ult — Harmonic Convergence.** 8s behind a 250 (+80% AP) (+8% HP) shield;
-  basic attacks also proc his three non-attuned elements at 40% strength.
+  heal for 35 + 80% of the banked amount.
+- **Ult — Harmonic Convergence.** 8s behind a 400 (+80% AP) (+8% HP) shield;
+  basic attacks proc all four elements at full strength.
 
 ## Layout
 

@@ -1,9 +1,9 @@
 {
     "anims": {
-        "fire": {
+        "splash": {
             "frames": [
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 0.0,
                         "y": 0.0,
@@ -12,7 +12,7 @@
                     }
                 },
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 24.0,
                         "y": 0.0,
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 48.0,
                         "y": 0.0,
@@ -30,7 +30,7 @@
                     }
                 },
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 72.0,
                         "y": 0.0,
@@ -39,7 +39,7 @@
                     }
                 },
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 96.0,
                         "y": 0.0,
@@ -48,7 +48,7 @@
                     }
                 },
                 {
-                    "duration": 0.08,
+                    "duration": 0.05,
                     "data": {
                         "x": 120.0,
                         "y": 0.0,

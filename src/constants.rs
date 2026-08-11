@@ -12,10 +12,6 @@ use crate::element::Element;
 /// Simulation tick rate.
 pub const TICKS_PER_SECOND: f64 = 60.0;
 
-/// Width and height of the match map, used to clamp displacement so a dash
-/// can never push an entity off the world.
-pub const MAP_SIZE: u64 = 960_000;
-
 /// Must match the mod folder name — the loader rejects a mismatch.
 pub const MOD_ID: &str = "avatar_wan_tfm2";
 
@@ -65,16 +61,26 @@ pub const AIR_MAX_STACKS: usize = 4;
 
 // Water: heal on hit, as a share of Wan's *missing* health — so it scales
 // with how much trouble he is in rather than with AP.
-pub const WATER_MISSING_HP_PERCENT: usize = 4;
+pub const WATER_MISSING_HP_PERCENT: usize = 5;
+/// Statless marker that makes the `view_buffs` entry of the same name draw the
+/// droplet burst where the attack landed — the same channel Earth's splash and
+/// Fire's flame use, since a native effect cannot trigger a view effect
+/// directly.
+pub const WATER_SPLASH_VFX_BUFF: &str = "wan_water_splash";
+/// Must match the run time of the `splash` tag in
+/// `effects/wan_water_splash#anim.fanim` — six frames at 0.05s. Deliberately
+/// shorter than Earth's: this one marks a single hit, not a shockwave.
+pub const WATER_SPLASH_VFX_TICKS: usize = 18;
 
 // Earth: a share of the basic attack itself, splashed around the target.
 /// Percent of Wan's attack damage each splashed enemy takes. Dealt with the
 /// same physical/magic split as the attack it copies, so Earth reads as the
 /// attack spreading outward rather than as a separate source of damage.
-pub const EARTH_ATTACK_SHARE: usize = 40;
+pub const EARTH_ATTACK_SHARE: usize = 50;
 /// Splash radius around the struck target. World units are 1000× the display
-/// scale, so "50 range" in the tooltip is 50,000 here.
-pub const EARTH_RADIUS: u64 = 50_000;
+/// scale, so "40 range" in the tooltip is 40,000 here — two thirds of his
+/// attack range.
+pub const EARTH_RADIUS: u64 = 40_000;
 /// Statless marker applied to each splashed enemy purely so the `view_buffs`
 /// entry of the same name draws the splash on them. A native effect cannot
 /// trigger a view effect directly; a buff is the channel that exists.
@@ -108,28 +114,32 @@ pub const STEP_BUFF_DURATION: usize = 4 * 60;
 /// Share of incoming damage banked during the window.
 pub const STEP_STORE_PERCENT: usize = 80;
 /// Share of the bank paid back as healing when the window ends.
-pub const STEP_HEAL_PERCENT: usize = 100;
+pub const STEP_HEAL_PERCENT: usize = 80;
+/// Paid on top of the bank, whether or not anything was banked — so casting it
+/// and not being touched is still worth a little, rather than nothing.
+pub const STEP_HEAL_FLAT: usize = 35;
 /// Prefix of the bookkeeping buff. Its name carries the running total and the
 /// last HP reading — see `match_hook`, which is what reads and rewrites it.
 pub const STEP_STORE_PREFIX: &str = "wan_step_store";
-/// The forward dash on cast: how far, and over how many ticks. The dash must
-/// finish inside the action's 12-tick `duration` in the .data_champion, and
-/// one attack range (60,000) is far enough to close on a target without
-/// carrying him past their whole line.
+/// The dash, mirrored from the `RushTime` effect in the .data_champion, which
+/// is what actually performs it — these two exist only so `expected_move_distance`
+/// can describe the skill to the AI. Keep them equal to `speed * tick` and
+/// `tick` over there, or the AI will value a dash the champion does not have.
 pub const STEP_DASH_DISTANCE: u64 = 60_000;
-pub const STEP_DASH_TICKS: usize = 8;
+pub const STEP_DASH_TICKS: usize = 20;
 
 // -- ult: Harmonic Convergence --
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
 pub const CONVERGENCE_DURATION: usize = 8 * 60;
-pub const CONVERGENCE_SHIELD: usize = 250;
+pub const CONVERGENCE_SHIELD: usize = 400;
 pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 80;
 pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 8;
-/// Full strength — what a proc is worth outside the ult, and what the element
-/// Wan is actually channeling keeps during it.
+/// Full strength, which is now the only strength: every proc is worth this,
+/// in or out of the ult. The scale itself is kept because `element::proc` and
+/// the burn's queued input still carry it end to end — that channel is what a
+/// future "half strength" effect would ride on, and it costs nothing to leave
+/// wired up.
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
-/// During the ult his other three elements proc too, at reduced strength.
-pub const CONVERGENCE_OFF_ELEMENT_SCALE: usize = 40;
 
 /// Seconds to ticks.
 #[allow(dead_code)]

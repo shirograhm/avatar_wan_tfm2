@@ -112,6 +112,16 @@ pub fn proc(
             };
             let heal = percent_of(max.saturating_sub(current), WATER_MISSING_HP_PERCENT);
             sim.heal(caster, caster, percent_of(heal, scale));
+
+            // Drawn on the target rather than on Wan, even though the heal
+            // lands on him: it marks where the water actually struck, which is
+            // what the projectile is pointing at. Layered like Earth's splash
+            // and Fire's flame — a second hit inside the first's run time adds
+            // its own copy on its own timer instead of restarting the burst.
+            sim.add_buff(
+                target,
+                &BuffV1::timed(WATER_SPLASH_VFX_BUFF, WATER_SPLASH_VFX_TICKS),
+            );
         }
 
         // Splashes off the struck target onto everything around it — the
@@ -183,14 +193,13 @@ pub fn earth_splash_damage(caster_stat: &StatV1, scale: usize) -> (usize, usize)
 /// to — the offensive half of Harmonic Convergence, as (physical, magic).
 ///
 /// Only Earth and Fire carry damage; Air and Water are worth real value but
-/// not in a form `expected_damage` can express. It slightly over-counts when
-/// he is already attuned to Earth or Fire, since that element is charged here
-/// at the off-element rate rather than the full one it actually keeps. Both
-/// errors point the same way — the ult is worth at least this much — which is
-/// the right direction for a hint the AI uses to decide whether to cast.
+/// not in a form `expected_damage` can express, so this understates the ult.
+/// It also counts both Earth and Fire even though one of them may be the
+/// element he is already on, which overstates it by one proc. Full strength
+/// either way, since the ult no longer dilutes what it adds.
 pub fn off_element_attack_damage(caster_stat: &StatV1) -> (usize, usize) {
-    let (physical, earth_magic) = earth_splash_damage(caster_stat, CONVERGENCE_OFF_ELEMENT_SCALE);
-    let burn = burn_tick_damage(caster_stat, CONVERGENCE_OFF_ELEMENT_SCALE) * BURN_TICKS;
+    let (physical, earth_magic) = earth_splash_damage(caster_stat, CONVERGENCE_BASE_SCALE);
+    let burn = burn_tick_damage(caster_stat, CONVERGENCE_BASE_SCALE) * BURN_TICKS;
     (physical, earth_magic + burn)
 }
 

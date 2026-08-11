@@ -126,26 +126,9 @@
     "action_name": "skill1",
     "description": "#asset/base/text/champion?description.avatar_wan.skill",
     "duration": 18,
-    "cooltime": 480,
+    "cooltime": 300,
     "start_timing": 8,
     "cancelable": false,
-    "range": 0,
-    "casting_type": "None",
-    "casting_target": "AllyOnlySelf",
-    "attack_type": "Skill",
-    "can_use_with_move": true,
-    "effect": {
-      "type": "Native",
-      "effect_ref": "avatar_wan_avatar_cycle"
-    }
-  },
-  "skill2": {
-    "action_name": "skill2",
-    "description": "#asset/base/text/champion?description.avatar_wan.skill2",
-    "duration": 12,
-    "cooltime": 840,
-    "start_timing": 1,
-    "cancelable": true,
     "range": 0,
     "casting_type": "None",
     "casting_target": "AllyOnlySelf",
@@ -156,7 +139,41 @@
       "effects": [
         {
           "type": "ViewEffect",
+          "name": "wan_avatar_cycle"
+        },
+        {
+          "type": "Native",
+          "effect_ref": "avatar_wan_avatar_cycle"
+        }
+      ]
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "description": "#asset/base/text/champion?description.avatar_wan.skill2",
+    "duration": 20,
+    "cooltime": 900,
+    "start_timing": 1,
+    "cancelable": false,
+    "range": 60000,
+    "casting_type": "Direction",
+    "casting_target": "AllyOnlySelf",
+    "attack_type": "Skill",
+    "effect": {
+      "type": "Combine",
+      "effects": [
+        {
+          "type": "ViewEffect",
           "name": "wan_spirit_step_streak"
+        },
+        {
+          "type": "RushTime",
+          "speed": 3000,
+          "tick": 20,
+          "range": 0,
+          "casting_target": "Enemy",
+          "penetrate": true,
+          "applied_effects": []
         },
         {
           "type": "Native",
@@ -184,6 +201,13 @@
   "view_effects": [
     {
       "type": "Animation",
+      "name": "wan_avatar_cycle",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_avatar_cycle",
+      "tag": "cycle",
+      "z": 1
+    },
+    {
+      "type": "Animation",
       "name": "wan_spirit_step_streak",
       "anim": "asset/avatar_wan_tfm2/aseprite_resources/champions/avatar_wan",
       "tag": "skill1_effect",
@@ -204,6 +228,13 @@
       "anim": "asset/avatar_wan_tfm2/effects/wan_earth_splash",
       "tag": "splash",
       "z": 0
+    },
+    {
+      "type": "Animated",
+      "name": "wan_water_splash",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_water_splash",
+      "tag": "splash",
+      "z": 1
     },
     {
       "type": "Animated",

@@ -44,6 +44,7 @@ fn window_open(entity: &StableEntity<'_, '_>) -> bool {
     (0..entity.buff_count()).any(|i| entity.buff_at(i).is_some_and(|b| b.name() == STEP_BUFF))
 }
 
+
 /// One entity's ledger state for this tick.
 struct Pending {
     entity: usize,
@@ -82,12 +83,15 @@ impl StableMatchHook for WanDamageStore {
             if p.open {
                 sim.add_buff(p.entity, &ledger_buff(p.banked, p.hp));
             } else {
-                // Window closed: pay the bank back and retire the ledger.
-                let heal = percent_of(p.banked, STEP_HEAL_PERCENT);
+                // Window closed: pay the bank back and retire the ledger. The
+                // flat share lands even on an empty bank, so a window nobody
+                // punished still returns something.
+                let heal = STEP_HEAL_FLAT + percent_of(p.banked, STEP_HEAL_PERCENT);
                 if heal > 0 {
                     sim.heal(p.entity, p.entity, heal);
                 }
             }
         }
+
     }
 }

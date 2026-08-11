@@ -14,9 +14,6 @@ use crate::element::{self, Element, CYCLE};
 // point at, except the burn tick, which `element::proc` queues at runtime.
 pub const AVATAR_CYCLE: &str = "avatar_wan_avatar_cycle";
 pub const SPIRIT_STEP: &str = "avatar_wan_spirit_step";
-/// Nothing points at this statically — `SpiritStep` queues it once per tick
-/// of the dash, the same way `element::proc` queues the burn.
-pub const SPIRIT_STEP_DASH: &str = "avatar_wan_spirit_step_dash";
 pub const HARMONIC_CONVERGENCE: &str = "avatar_wan_harmonic_convergence";
 pub const FIRE_BURN_TICK: &str = "avatar_wan_fire_burn_tick";
 
@@ -83,16 +80,12 @@ impl StableEffectType for SoulOfRaava {
             AttackTypeV1::BaseAttack,
         );
 
-        // Under the ult the attuned element is unchanged and the other three
-        // come along at half strength — the ult is breadth, not a multiplier.
+        // Under the ult every element procs at full strength — Raava's whole
+        // power, not a diluted sample of it. That makes a converged attack
+        // worth four procs instead of one, which is the entire ult.
         if converged {
             for candidate in CYCLE {
-                let scale = if candidate == launched {
-                    CONVERGENCE_BASE_SCALE
-                } else {
-                    CONVERGENCE_OFF_ELEMENT_SCALE
-                };
-                element::proc(sim, caster_id, target, &stat, candidate, scale);
+                element::proc(sim, caster_id, target, &stat, candidate, CONVERGENCE_BASE_SCALE);
             }
         } else {
             element::proc(
@@ -217,46 +210,22 @@ impl StableEffectType for SpiritStep {
         sim.add_buff(caster_id, &Self::buff());
         sim.add_buff(caster_id, &crate::match_hook::ledger_buff(0, hp));
 
-        // The window opens whether or not the dash finds somewhere to go, so
-        // every early return below leaves the buff and ledger already applied.
-        let Some((from, radius)) = sim
-            .get_entity(caster_id)
-            .map(|entity| (entity.pos(), entity.radius() as u64))
-        else {
-            return;
-        };
-        let Some(toward) = crate::util::nearest_enemy_champion(sim, caster_id)
-            .and_then(|id| sim.get_entity(id))
-            .map(|entity| entity.pos())
-        else {
-            return;
-        };
-        let destination = crate::util::clamp_to_map(
-            crate::util::step_toward(from, toward, STEP_DASH_DISTANCE),
-            radius,
-        );
-
-        // One queued step per tick instead of a single `entity_set_pos`, so
-        // the move reads as a glide rather than a blink. Each step re-reads
-        // his position and walks a fixed slice of what is left, so a
-        // displacement mid-dash is absorbed instead of being undone.
-        for tick in 1..=STEP_DASH_TICKS {
-            sim.queue_effect(
-                SPIRIT_STEP_DASH,
-                AttackTypeV1::Skill,
-                caster_id,
-                &InputTargetV1::pos(destination.0, destination.1),
-                tick,
-            );
-        }
+        // The dash itself is not here: it is the `RushTime` beside this effect
+        // in the .data_champion, which is the engine's own directional dash —
+        // the one Lucian and Vayne use. Moving him from Rust meant writing
+        // positions the renderer would not show until the action ended, and it
+        // could not be animated or collide properly. Declaring it hands all
+        // three to the engine, and this effect is left doing what only it can:
+        // opening the banking window.
     }
 
     fn expected_buff(&self, _caster_stat: &StatV1) -> Option<BuffV1> {
         Some(Self::buff())
     }
 
-    /// Lets the AI treat Spirit Step as the gap-closer it now is, rather than
-    /// as a pure self-buff it would only ever cast standing still.
+    /// Lets the AI treat Spirit Step as the gap-closer it is, rather than as a
+    /// pure self-buff it would only ever cast standing still. The movement is
+    /// the `RushTime` beside this effect; these numbers only describe it.
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
         Some((STEP_DASH_TICKS, STEP_DASH_DISTANCE))
     }
@@ -265,55 +234,11 @@ impl StableEffectType for SpiritStep {
     /// taken during the window, which is unknowable at cast time, so quote the
     /// window's own length as a rough stand-in for its worth.
     fn expected_heal(&self, caster_stat: &StatV1) -> usize {
-        percent_of(
-            percent_of(caster_stat.hp, STEP_STORE_PERCENT),
-            STEP_HEAL_PERCENT,
-        ) / 4
-    }
-
-    fn on_caster(&self) -> bool {
-        true
-    }
-
-    fn can_move(&self) -> bool {
-        true
-    }
-}
-
-/// One tick of Spirit Step's dash.
-///
-/// The destination rides in the input's position fields, because a queued
-/// effect carries no payload of its own — the same channel the burn uses for
-/// its damage scale. Both ends of it live in this mod.
-///
-/// Note that the stable API has no wall or collision query, so this walks Wan
-/// straight to the destination regardless of terrain. `step_toward` clamps to
-/// the map, which is the only guard available.
-pub struct SpiritStepDash;
-
-impl StableEffectType for SpiritStepDash {
-    fn apply(
-        &self,
-        sim: &mut StableSim<'_>,
-        _rng_seed: u64,
-        caster_id: usize,
-        input: InputTargetV1,
-    ) {
-        let Some((from, radius)) = sim
-            .get_entity(caster_id)
-            .map(|entity| (entity.pos(), entity.radius() as u64))
-        else {
-            return;
-        };
-
-        // Clamped every step, not just at the destination: he is displaceable
-        // mid-dash, so any single step can be the one that would leave the map.
-        let stride = STEP_DASH_DISTANCE / STEP_DASH_TICKS as u64;
-        let (x, y) = crate::util::clamp_to_map(
-            crate::util::step_toward(from, (input.x, input.y), stride),
-            radius,
-        );
-        sim.entity_set_pos(caster_id, x, y);
+        STEP_HEAL_FLAT
+            + percent_of(
+                percent_of(caster_stat.hp, STEP_STORE_PERCENT),
+                STEP_HEAL_PERCENT,
+            ) / 4
     }
 
     fn on_caster(&self) -> bool {
