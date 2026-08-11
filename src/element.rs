@@ -118,13 +118,24 @@ pub fn proc(
         // target itself is spared, since the attack already hit it — so Earth
         // is the wave-clear element.
         Element::Earth => {
-            let damage = percent_of(
-                EARTH_DAMAGE + percent_of(caster_stat.magic_power, EARTH_AP_RATIO),
-                scale,
-            );
+            let (physical, magic) = earth_splash_damage(caster_stat, scale);
             for splashed in crate::util::enemies_near(sim, caster, target, EARTH_RADIUS) {
-                sim.deal_damage(caster, splashed, damage, 0, AttackTypeV1::BaseAttack);
+                sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::BaseAttack);
             }
+
+            // One burst, on the target the attack struck — it is the centre the
+            // splash radiates from, so drawing a copy on every enemy caught in
+            // it would read as several impacts instead of one. Note this is the
+            // one enemy the splash does *not* damage.
+            //
+            // Layered on purpose: a second splash inside the first's run time
+            // adds its own copy rather than restarting the animation, so rapid
+            // hits read as overlapping impacts. Each stack runs its own timer,
+            // the same way Air's do.
+            sim.add_buff(
+                target,
+                &BuffV1::timed(EARTH_SPLASH_VFX_BUFF, EARTH_SPLASH_VFX_TICKS),
+            );
         }
 
         // The burn is queued as repeating ticks of a registered native effect;
@@ -145,8 +156,42 @@ pub fn proc(
                     tick * BURN_TICK_INTERVAL,
                 );
             }
+
+            // Layered, like Earth's splash and like the burn itself: a second
+            // application stacks its own flame on its own timer rather than
+            // refreshing, so the fire is showing exactly while ticks are still
+            // queued.
+            sim.add_buff(target, &BuffV1::timed(BURN_VFX_BUFF, BURN_VFX_TICKS));
         }
     }
+}
+
+/// What each enemy caught in Earth's splash takes, as (physical, magic).
+///
+/// A share of the attack that produced it, split down the middle the same way
+/// [`effects::SoulOfRaava`] splits the attack itself — so armour and magic
+/// resist each answer only half of the splash, exactly as they do the hit.
+pub fn earth_splash_damage(caster_stat: &StatV1, scale: usize) -> (usize, usize) {
+    let total = percent_of(percent_of(caster_stat.attack, EARTH_ATTACK_SHARE), scale);
+    (
+        percent_of(total, ATTACK_PHYSICAL_SHARE),
+        percent_of(total, ATTACK_MAGIC_SHARE),
+    )
+}
+
+/// What one basic attack gains from the three elements Wan is *not* attuned
+/// to — the offensive half of Harmonic Convergence, as (physical, magic).
+///
+/// Only Earth and Fire carry damage; Air and Water are worth real value but
+/// not in a form `expected_damage` can express. It slightly over-counts when
+/// he is already attuned to Earth or Fire, since that element is charged here
+/// at the off-element rate rather than the full one it actually keeps. Both
+/// errors point the same way — the ult is worth at least this much — which is
+/// the right direction for a hint the AI uses to decide whether to cast.
+pub fn off_element_attack_damage(caster_stat: &StatV1) -> (usize, usize) {
+    let (physical, earth_magic) = earth_splash_damage(caster_stat, CONVERGENCE_OFF_ELEMENT_SCALE);
+    let burn = burn_tick_damage(caster_stat, CONVERGENCE_OFF_ELEMENT_SCALE) * BURN_TICKS;
+    (physical, earth_magic + burn)
 }
 
 /// Damage of a single burn tick, recomputed from Wan's stats when it lands so

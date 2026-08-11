@@ -27,6 +27,31 @@ pub const MOD_ID: &str = "avatar_wan_tfm2";
 pub const ATTACK_MAGIC_SHARE: usize = 50;
 pub const ATTACK_PHYSICAL_SHARE: usize = 50;
 
+// -- how the AI plays him --
+/// Wan's champion id, as the AI boundary reports it — what `player_ai::matches`
+/// compares against so the override touches nobody else's champion.
+pub const CHAMPION_ID: &str = "avatar_wan";
+/// Must match `attack.range` in the .data_champion. Duplicated because the AI
+/// decides at a distance and the data file is not readable from here.
+pub const ATTACK_RANGE: u64 = 60_000;
+/// How far past his own range he will walk to start a fight. A quarter of a
+/// range further than he can already shoot is a step forward, not a dive.
+pub const AGGRO_ENGAGE_RANGE: u64 = 71_000;
+/// An enemy champion this close means he is in a fight. Creeps and towers do
+/// not count: Spirit Step banks damage, and only champions threaten enough of
+/// it to be worth the cooldown.
+pub const AGGRO_COMBAT_RANGE: u64 = 90_000;
+/// Below this, out of combat, he stops casting Spirit Step for the heal — the
+/// bank cannot fill with nobody hitting him, so the cast is pure waste.
+pub const AGGRO_LOW_HP: usize = 50;
+/// Health percent he will keep trading at normally…
+pub const AGGRO_HP_FLOOR: usize = 55;
+/// …and while Spirit Step or Harmonic Convergence is running, when the damage
+/// he takes is being paid back or absorbed and backing off wastes the window.
+/// Still well above the default AI's threshold, but no longer a floor he only
+/// reaches by having already lost the fight.
+pub const AGGRO_COMMITTED_HP_FLOOR: usize = 30;
+
 // -- elements --
 /// Wan starts attuned to fire, the element he learned first, so his first
 /// Avatar Cycle moves him to the next entry in `element::CYCLE`.
@@ -42,12 +67,22 @@ pub const AIR_MAX_STACKS: usize = 4;
 // with how much trouble he is in rather than with AP.
 pub const WATER_MISSING_HP_PERCENT: usize = 4;
 
-// Earth: bonus physical damage, splashed around the target.
-pub const EARTH_DAMAGE: usize = 10;
-pub const EARTH_AP_RATIO: usize = 45;
+// Earth: a share of the basic attack itself, splashed around the target.
+/// Percent of Wan's attack damage each splashed enemy takes. Dealt with the
+/// same physical/magic split as the attack it copies, so Earth reads as the
+/// attack spreading outward rather than as a separate source of damage.
+pub const EARTH_ATTACK_SHARE: usize = 40;
 /// Splash radius around the struck target. World units are 1000× the display
 /// scale, so "50 range" in the tooltip is 50,000 here.
 pub const EARTH_RADIUS: u64 = 50_000;
+/// Statless marker applied to each splashed enemy purely so the `view_buffs`
+/// entry of the same name draws the splash on them. A native effect cannot
+/// trigger a view effect directly; a buff is the channel that exists.
+pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
+/// Must match the run time of the `splash` tag in
+/// `effects/wan_earth_splash#anim.fanim` — six frames at 0.1s. Too short and
+/// the animation is cut off; too long and it holds on its last frame.
+pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
 // Fire: burn over time on hit.
 pub const BURN_DAMAGE: usize = 10;
@@ -56,6 +91,13 @@ pub const BURN_AP_RATIO: usize = 25;
 /// Six ticks, one every half second, for three seconds total.
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
+/// Statless marker that makes the `view_buffs` entry of the same name loop the
+/// flame on whatever is burning, the same channel Earth's splash uses.
+pub const BURN_VFX_BUFF: &str = "wan_fire_burn";
+/// Held for as long as the burn actually lasts, not for one pass of the
+/// animation — the tag loops, so this is what decides when it stops. Derived
+/// from the burn itself so retuning the damage cannot desync the flame.
+pub const BURN_VFX_TICKS: usize = BURN_TICKS * BURN_TICK_INTERVAL;
 
 // -- skill2: Spirit Step --
 /// The window itself: carries the movement speed and marks how long damage is

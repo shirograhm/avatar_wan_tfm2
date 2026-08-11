@@ -1,12 +1,14 @@
 {
-  "avatar_wan": {
-    "face": {
-      "x": 0,
-      "y": -32
-    },
-    "center": {
-      "x": 0,
-      "y": -12
+  "entries": {
+    "avatar_wan": {
+      "face": {
+        "x": 0,
+        "y": -32
+      },
+      "center": {
+        "x": 0,
+        "y": -12
+      }
     }
   }
 }

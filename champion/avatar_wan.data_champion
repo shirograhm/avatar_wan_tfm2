@@ -44,6 +44,7 @@
     "cooltime": 60,
     "start_timing": 14,
     "cancelable": true,
+    "can_use_with_move": true,
     "range": 60000,
     "casting_type": "Targeting",
     "casting_target": "Enemy",
@@ -151,8 +152,17 @@
     "attack_type": "Skill",
     "can_use_with_move": true,
     "effect": {
-      "type": "Native",
-      "effect_ref": "avatar_wan_spirit_step"
+      "type": "Combine",
+      "effects": [
+        {
+          "type": "ViewEffect",
+          "name": "wan_spirit_step_streak"
+        },
+        {
+          "type": "Native",
+          "effect_ref": "avatar_wan_spirit_step"
+        }
+      ]
     }
   },
   "ult": {
@@ -171,6 +181,38 @@
       "effect_ref": "avatar_wan_harmonic_convergence"
     }
   },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "wan_spirit_step_streak",
+      "anim": "asset/avatar_wan_tfm2/aseprite_resources/champions/avatar_wan",
+      "tag": "skill1_effect",
+      "z": -1
+    }
+  ],
+  "view_buffs": [
+    {
+      "type": "Animated",
+      "name": "wan_fire_burn",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_fire_burn",
+      "tag": "burn",
+      "z": 1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_earth_splash",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_earth_splash",
+      "tag": "splash",
+      "z": 0
+    },
+    {
+      "type": "Animated",
+      "name": "wan_harmonic_convergence",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_ult_area",
+      "tag": "area",
+      "z": -1
+    }
+  ],
   "view_projectiles": [
     {
       "type": "Sprite",
@@ -188,9 +230,11 @@
       "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_earth"
     },
     {
-      "type": "Sprite",
+      "type": "Animated",
       "name": "wan_attack_fire",
-      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_fire"
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_fire",
+      "tag": "fire",
+      "z": 0
     }
   ]
 }

@@ -114,6 +114,13 @@ impl StableEffectType for SoulOfRaava {
             percent_of(caster_stat.attack, ATTACK_MAGIC_SHARE),
         )
     }
+
+    /// Nothing here roots him — the shot is already in the air by the time
+    /// this lands. Pairs with `can_use_with_move` on the attack action, which
+    /// is what actually lets him fire on the move.
+    fn can_move(&self) -> bool {
+        true
+    }
 }
 
 /// One tick of the fire burn, queued six times by [`element::proc`]. The
@@ -355,6 +362,15 @@ impl StableEffectType for HarmonicConvergence {
 
     fn expected_buff(&self, _caster_stat: &StatV1) -> Option<BuffV1> {
         Some(Self::buff())
+    }
+
+    /// The ult is an eight-second damage window that happens to come with a
+    /// shield, but quoting only the shield made it read as a panic button —
+    /// something to hold until his health was low, which is the last moment
+    /// it is worth anything. Quoting what it adds to every basic attack in
+    /// that window is what makes the AI open a fight with it instead.
+    fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
+        element::off_element_attack_damage(caster_stat)
     }
 
     fn expected_shield(&self, caster_stat: &StatV1) -> usize {
