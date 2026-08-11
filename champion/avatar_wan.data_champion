@@ -16,11 +16,11 @@
     "asset/avatar_wan_tfm2/icons/avatar_wan_ult"
   ],
   "stat": {
-    "attack": 68,
+    "attack": 67,
     "magic_power": 6,
-    "hp": 810,
-    "defence": 27,
-    "magic_resistance": 22,
+    "hp": 760,
+    "defence": 22,
+    "magic_resistance": 16,
     "move_speed": 900,
     "hp_regen": 0,
     "stack": 0,
@@ -29,7 +29,7 @@
   "growth": {
     "attack": 7,
     "magic_power": 12,
-    "hp": 77,
+    "hp": 82,
     "defence": 7,
     "magic_resistance": 3,
     "move_speed": 2,
@@ -170,7 +170,7 @@
           "type": "RushTime",
           "speed": 3000,
           "tick": 20,
-          "range": 0,
+          "range": 60000,
           "casting_target": "Enemy",
           "penetrate": true,
           "applied_effects": []
@@ -246,9 +246,11 @@
   ],
   "view_projectiles": [
     {
-      "type": "Sprite",
+      "type": "Animated",
       "name": "wan_attack_air",
-      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_air"
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_air",
+      "tag": "air",
+      "z": 0
     },
     {
       "type": "Sprite",

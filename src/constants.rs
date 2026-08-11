@@ -33,6 +33,16 @@ pub const ATTACK_RANGE: u64 = 60_000;
 /// How far past his own range he will walk to start a fight. A quarter of a
 /// range further than he can already shoot is a step forward, not a dive.
 pub const AGGRO_ENGAGE_RANGE: u64 = 71_000;
+/// The one thing that still pulls him out of Harmonic Convergence. The ult
+/// otherwise suspends his health floor entirely, which is right while the
+/// shield is doing its job and wrong once it is gone — below this he is dying
+/// with the window still running, and a corpse lands no attacks at all.
+pub const AGGRO_ULT_HP_FLOOR: usize = 15;
+/// How far he will walk to find someone to spend Harmonic Convergence on.
+/// Further than [`AGGRO_ENGAGE_RANGE`]: the ult is eight seconds of empowered
+/// attacks on a long cooldown, and a second spent walking is a second of it
+/// thrown away, so it is worth more of a step than a normal engage is.
+pub const AGGRO_ULT_ENGAGE_RANGE: u64 = 90_000;
 /// An enemy champion this close means he is in a fight. Creeps and towers do
 /// not count: Spirit Step banks damage, and only champions threaten enough of
 /// it to be worth the cooldown.
@@ -93,7 +103,7 @@ pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 // Fire: burn over time on hit.
 pub const BURN_DAMAGE: usize = 10;
 pub const BURN_AD_RATIO: usize = 15;
-pub const BURN_AP_RATIO: usize = 25;
+pub const BURN_AP_RATIO: usize = 35;
 /// Six ticks, one every half second, for three seconds total.
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
@@ -125,6 +135,11 @@ pub const STEP_STORE_PREFIX: &str = "wan_step_store";
 /// is what actually performs it — these two exist only so `expected_move_distance`
 /// can describe the skill to the AI. Keep them equal to `speed * tick` and
 /// `tick` over there, or the AI will value a dash the champion does not have.
+///
+/// The `range` beside them over there must stay equal to this distance too. It
+/// was 0, and he did not move at all: whether the engine reads that field as
+/// how far the rush may carry him or as how far it looks for something to rush
+/// at, zero is the answer that goes nowhere.
 pub const STEP_DASH_DISTANCE: u64 = 60_000;
 pub const STEP_DASH_TICKS: usize = 20;
 

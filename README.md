@@ -10,7 +10,7 @@ updates and builds with any Rust toolchain — no pinned nightly.
   physical, and procs the element Wan is attuned to.
 - **Skill (Lv. 1) — The Avatar Cycle.** Swap to the next element in the cycle
   (Air → Water → Earth → Fire → Air). Wan spawns on Fire.
-  - **Fire:** burn for 10 (+10% AD) (+25% AP) magic damage over 3s.
+  - **Fire:** burn for 10 (+15% AD) (+35% AP) magic damage over 3s.
   - **Air:** +4% Attack Speed for 2s on hit, up to 4 stacks.
   - **Water:** heals 5 (+5% AP) on hit.
   - **Earth:** 50% of the attack's own damage, split physical/magic the same

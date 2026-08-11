@@ -153,6 +153,14 @@ pub fn proc(
         // its own, so `scale` rides along in the input's unused `x` field —
         // both ends of that channel live in this mod.
         Element::Fire => {
+            // Towers do not burn. A structure standing still under a damage
+            // over time it cannot walk out of turns Fire into the siege
+            // element by accident, which is Earth's job — and the flame drawn
+            // on a tower reads as a bug besides.
+            if sim.get_entity(target).is_some_and(|entity| entity.is_tower()) {
+                return;
+            }
+
             let input = InputTargetV1 {
                 x: scale as u64,
                 ..InputTargetV1::target(target)

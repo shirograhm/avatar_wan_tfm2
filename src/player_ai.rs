@@ -16,6 +16,14 @@
 //! also overrule a retreat or a recall, and it will walk him half a range
 //! further to find someone to spend the window on.
 //!
+//! Harmonic Convergence is the hard case: it is worth only what he attacks
+//! into it, so while it runs he attacks and does nothing else — a longer walk
+//! to reach a champion, an Avatar Cycle cast overruled (all four elements are
+//! already firing), and anything at all in range taken as a target rather than
+//! spending the window standing still. His health floor drops to
+//! [`AGGRO_ULT_HP_FLOOR`] for the duration, low enough that only actually
+//! dying pulls him out.
+//!
 //! It also vetoes one cast: Spirit Step, when he is hurt and alone. The skill
 //! is judged by `expected_heal`, which is a static number — it cannot know
 //! whether anyone is around to deal the damage it pays back. Here that is
@@ -45,6 +53,25 @@ impl AggressiveWan {
     fn committed(sim: &StableSim<'_>, entity: usize) -> bool {
         element::has_buff(sim, entity, STEP_BUFF)
             || element::has_buff(sim, entity, CONVERGENCE_BUFF)
+    }
+
+    /// True while Harmonic Convergence is running — the window whose whole
+    /// value is in the attacks he lands during it.
+    fn converging(sim: &StableSim<'_>, entity: usize) -> bool {
+        element::has_buff(sim, entity, CONVERGENCE_BUFF)
+    }
+
+    /// Nearest living enemy of *any* kind within `range` — creeps and towers
+    /// included, unlike [`Self::enemy_champion_near`].
+    ///
+    /// Only the ult uses this, and only at attack range, so it never sends him
+    /// walking at a creep: it is the difference between finishing the window
+    /// swinging at whatever is in front of him and standing still.
+    fn any_enemy_near(sim: &StableSim<'_>, entity: usize, range: u64) -> Option<usize> {
+        crate::util::enemies_near(sim, entity, entity, range)
+            .into_iter()
+            // Ties resolve by entity order, which is deterministic.
+            .min_by_key(|&id| sim.distance_sq(entity, id))
     }
 
     /// Nearest living enemy champion within `range` of `entity`.
@@ -95,6 +122,7 @@ impl StablePlayerAi for AggressiveWan {
             Some(InputKindV1::Move)
                 | Some(InputKindV1::Return)
                 | Some(InputKindV1::Attack)
+                | Some(InputKindV1::Skill)
                 | Some(InputKindV1::Skill2)
                 | None
         ) {
@@ -112,6 +140,7 @@ impl StablePlayerAi for AggressiveWan {
             let me = me.id();
 
             let committed = Self::committed(&sim, me);
+            let converging = Self::converging(&sim, me);
             let in_combat = Self::enemy_champion_near(&sim, me, AGGRO_COMBAT_RANGE).is_some();
 
             if base_kind == Some(InputKindV1::Skill2) {
@@ -125,6 +154,42 @@ impl StablePlayerAi for AggressiveWan {
                     Plan::Disengage
                 } else {
                     Plan::Keep
+                }
+            } else if base_kind == Some(InputKindV1::Skill) && !converging {
+                // Which element he is on is his call — the cycle is the one
+                // decision the default AI makes with information this does not
+                // have. The single exception is handled just below.
+                Plan::Keep
+            } else if converging && hp_percent < AGGRO_ULT_HP_FLOOR {
+                // The one exit from the window: this low, the shield is spent
+                // and the next hit kills him, which ends the ult far more
+                // completely than walking out of it does.
+                Plan::Disengage
+            } else if converging && base_kind == Some(InputKindV1::Attack) {
+                // Already swinging, which is the whole point — and the default
+                // AI's target knows things about focus fire that "nearest"
+                // does not.
+                Plan::Keep
+            } else if converging {
+                // Harmonic Convergence is worth exactly as many attacks as he
+                // lands inside it: every attack procs all four elements, and
+                // the shield is there so that standing in range costs him
+                // nothing. So for these eight seconds nothing else is worth
+                // doing — not retreating, not recalling, and not cycling,
+                // since all four elements are already firing at full strength
+                // and the cast would only cost him a swing.
+                //
+                // The health floor is [`AGGRO_ULT_HP_FLOOR`] rather than the
+                // committed one, and it is checked above: the shield is what
+                // breaks first, so backing off with it still up wastes the
+                // window it was spent on.
+                match Self::enemy_champion_near(&sim, me, AGGRO_ULT_ENGAGE_RANGE)
+                    // Nobody worth walking at — swing at whatever is already
+                    // in front of him instead of idling out the window.
+                    .or_else(|| Self::any_enemy_near(&sim, me, ATTACK_RANGE))
+                {
+                    Some(target) => Plan::Attack(target),
+                    None => Plan::Keep,
                 }
             } else if !committed && base_kind != Some(InputKindV1::Move) {
                 // Outside a window he only gets talked out of *walking away* —
