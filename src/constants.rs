@@ -32,8 +32,8 @@ pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
 pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
 pub const BURN_DAMAGE: usize = 10;
-pub const BURN_AD_RATIO: usize = 15;
-pub const BURN_AP_RATIO: usize = 35;
+pub const BURN_AD_RATIO: usize = 5;
+pub const BURN_AP_RATIO: usize = 75;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
 pub const BURN_VFX_BUFF: &str = "wan_fire_burn";
