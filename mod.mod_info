@@ -4,11 +4,11 @@
   "author": "shirograhm",
   "version": "0.1.0",
   "description": "Adds Wan, the first Avatar, as a playable champion.",
-  "last_updated": "2026-08-09",
+  "last_updated": "2026-08-11",
   "dependencies": [
     {
       "mod_id": "base",
-      "version": ">=0.5.4"
+      "version": ">=0.5.0"
     }
   ]
 }

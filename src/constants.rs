@@ -12,7 +12,7 @@ macro_rules! ticks {
 // ------------------------------------------------ Soul of Raava
 pub const ATTACK_MAGIC_SHARE: usize = 50;
 pub const ATTACK_PHYSICAL_SHARE: usize = 50;
-pub const ATTACK_COOLTIME: usize = 60;
+pub const ATTACK_COOLTIME: usize = 50;
 
 // ------------------------------------------------ Elements
 pub const STARTING_ELEMENT: Element = Element::Fire;
@@ -32,7 +32,7 @@ pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
 pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
 pub const BURN_DAMAGE: usize = 10;
-pub const BURN_AD_RATIO: usize = 5;
+pub const BURN_AD_RATIO: usize = 15;
 pub const BURN_AP_RATIO: usize = 75;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
@@ -53,9 +53,9 @@ pub const STEP_DASH_TICKS: usize = 20;
 // ------------------------------------------------ Harmonic Convergence
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
 pub const CONVERGENCE_DURATION: usize = ticks!(8.0) as usize;
-pub const CONVERGENCE_SHIELD: usize = 400;
-pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 80;
-pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 8;
+pub const CONVERGENCE_SHIELD: usize = 200;
+pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 100;
+pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 10;
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
 // How hurt to assume he is when valuing Water's heal — used by the basic
 // attack and by the ult, since neither can read current HP.

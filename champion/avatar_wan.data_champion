@@ -41,7 +41,7 @@
     "action_name": "attack",
     "description": "#asset/base/text/champion?description.avatar_wan.attack",
     "duration": 24,
-    "cooltime": 60,
+    "cooltime": 50,
     "start_timing": 14,
     "cancelable": false,
     "range": 60000,
@@ -294,14 +294,14 @@
       "name": "wan_attack_convergence",
       "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_convergence",
       "tag": "convergence",
-      "z": 0
+      "z": 1
     },
     {
       "type": "Animated",
       "name": "wan_attack_convergence_comet",
       "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_convergence_comet",
       "tag": "convergence",
-      "z": 0
+      "z": 1
     }
   ]
 }
