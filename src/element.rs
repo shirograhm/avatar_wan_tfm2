@@ -103,7 +103,9 @@ pub fn proc(
         Element::Earth => {
             let (physical, magic) = earth_splash_damage(caster_stat, scale);
             for splashed in crate::util::enemies_near(sim, caster, target, EARTH_RADIUS) {
-                sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::BaseAttack);
+                // The splash is the element's bonus, not the attack that
+                // carried it, so it lands as skill damage.
+                sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::Skill);
             }
 
             sim.add_buff(
@@ -128,7 +130,7 @@ pub fn proc(
             for tick in 1..=BURN_TICKS {
                 sim.queue_effect(
                     crate::effects::FIRE_BURN_TICK,
-                    AttackTypeV1::Dot,
+                    AttackTypeV1::Skill,
                     caster,
                     &input,
                     tick * BURN_TICK_INTERVAL,

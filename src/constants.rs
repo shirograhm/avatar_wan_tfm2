@@ -60,8 +60,13 @@ pub const CONVERGENCE_BASE_SCALE: usize = 100;
 // How hurt to assume he is when valuing Water's heal — used by the basic
 // attack and by the ult, since neither can read current HP.
 pub const EXPECTED_MISSING_HP_PERCENT: usize = 25;
-pub const CONVERGENCE_ATTACK_SPEED_PERCENT: usize =
-    100 + AIR_MAX_STACKS * AIR_ATTACK_SPEED_PERCENT as usize;
+/// Attack speed the ult itself grants for its duration.
+pub const CONVERGENCE_ATTACK_SPEED_BONUS: i32 = 20;
+/// Total attack speed to assume while converged: the ult's own bonus on top of
+/// Air at max stacks, which he is attacking often enough to hold.
+pub const CONVERGENCE_ATTACK_SPEED_PERCENT: usize = 100
+    + CONVERGENCE_ATTACK_SPEED_BONUS as usize
+    + AIR_MAX_STACKS * AIR_ATTACK_SPEED_PERCENT as usize;
 
 pub fn percent_of(value: usize, percent: usize) -> usize {
     (value * percent) / 100

@@ -128,7 +128,9 @@ impl StableEffectType for FireBurnTick {
         };
         let stat = stat_of(sim, caster_id);
         let damage = element::burn_tick_damage(&stat, scale);
-        sim.deal_damage(caster_id, input.target_id, 0, damage, AttackTypeV1::Dot);
+        // Burn ticks are Fire's bonus, so they count as skill damage rather
+        // than as a DoT.
+        sim.deal_damage(caster_id, input.target_id, 0, damage, AttackTypeV1::Skill);
     }
 
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
@@ -220,7 +222,9 @@ pub struct HarmonicConvergence;
 
 impl HarmonicConvergence {
     fn buff() -> BuffV1 {
-        BuffV1::timed(CONVERGENCE_BUFF, CONVERGENCE_DURATION)
+        let mut buff = BuffV1::timed(CONVERGENCE_BUFF, CONVERGENCE_DURATION);
+        buff.attack_speed_mult = CONVERGENCE_ATTACK_SPEED_BONUS;
+        buff
     }
 
     fn shield_amount(caster_stat: &StatV1) -> usize {
