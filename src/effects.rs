@@ -1,17 +1,8 @@
-//! Effect logic — the part of an action that actually touches the simulation.
-//!
-//! `apply` runs inside the deterministic sim. The `expected_*` methods are
-//! what the AI reads to decide whether casting is worth it; leaving them at
-//! their defaults makes the champion read as harmless and it will never pick
-//! the skill on purpose.
-
 use mod_api_stable::*;
 
 use crate::constants::*;
 use crate::element::{self, Element, CYCLE};
 
-// Registration names — the `effect_ref` values the .data_champion actions
-// point at, except the burn tick, which `element::proc` queues at runtime.
 pub const AVATAR_CYCLE: &str = "avatar_wan_avatar_cycle";
 pub const SPIRIT_STEP: &str = "avatar_wan_spirit_step";
 pub const HARMONIC_CONVERGENCE: &str = "avatar_wan_harmonic_convergence";
@@ -23,25 +14,19 @@ fn stat_of(sim: &StableSim<'_>, entity: usize) -> StatV1 {
 }
 
 // ------------------------------------------------ basic attack: Soul of Raava
+/// `None` is the shot fired during Harmonic Convergence, which procs all four
+/// elements rather than one.
+pub struct SoulOfRaava(pub Option<Element>);
 
-/// Wan's basic attack, applied when his projectile lands: his attack damage
-/// split half physical / half magic, plus the on-hit proc of the element he
-/// was attuned to **when he fired**.
-///
-/// The element is baked into the effect rather than read at impact. The
-/// `.data_champion` branches on the element buff at launch to pick the
-/// projectile visual, and each branch points at the matching one of these —
-/// so the shot that leaves as fire lands as fire even if Wan cycles
-/// mid-flight, and the visual can never disagree with the proc.
-pub struct SoulOfRaava(pub Element);
-
-/// The four registered names, paired with the element each one procs. The
-/// `.data_champion` picks between them in its `SwitchByBuff` chain.
-pub const ATTACK_HITS: [(&str, Element); 4] = [
-    ("avatar_wan_attack_hit_air", Element::Air),
-    ("avatar_wan_attack_hit_water", Element::Water),
-    ("avatar_wan_attack_hit_earth", Element::Earth),
-    ("avatar_wan_attack_hit_fire", Element::Fire),
+pub const ATTACK_HITS: [(&str, Option<Element>); 5] = [
+    ("avatar_wan_attack_hit_air", Some(Element::Air)),
+    ("avatar_wan_attack_hit_water", Some(Element::Water)),
+    ("avatar_wan_attack_hit_earth", Some(Element::Earth)),
+    ("avatar_wan_attack_hit_fire", Some(Element::Fire)),
+    // Exists so the ult's branch of the .data_champion can carry its own
+    // projectile — and so `expected_damage` can price that shot as all four
+    // procs instead of one.
+    ("avatar_wan_attack_hit_convergence", None),
 ];
 
 impl StableEffectType for SoulOfRaava {
@@ -57,21 +42,17 @@ impl StableEffectType for SoulOfRaava {
         }
         let target = input.target_id;
 
-        // Every read happens before the first mutation: an entity view borrows
-        // the sim, and dealing damage needs it back.
         let stat = stat_of(sim, caster_id);
         let converged = element::has_buff(sim, caster_id, CONVERGENCE_BUFF);
-        let launched = self.0;
+        // A converged shot has no single element. It only reaches the branch
+        // below if the buff fell off mid-flight, in which case the starting
+        // element is as good a guess as any.
+        let launched = self.0.unwrap_or(STARTING_ELEMENT);
 
-        // Bootstrap the attunement on the first hit of a life. There is no
-        // passive to do it now that the champion is data-declared, and the
-        // buff is what the cycle and the projectile branch both read.
         if element::current(sim, caster_id).is_none() {
             element::attune(sim, caster_id, launched);
         }
 
-        // Full attack damage, split half physical / half magic so armour and
-        // magic resist each only answer one side of it.
         sim.deal_damage(
             caster_id,
             target,
@@ -80,12 +61,16 @@ impl StableEffectType for SoulOfRaava {
             AttackTypeV1::BaseAttack,
         );
 
-        // Under the ult every element procs at full strength — Raava's whole
-        // power, not a diluted sample of it. That makes a converged attack
-        // worth four procs instead of one, which is the entire ult.
         if converged {
             for candidate in CYCLE {
-                element::proc(sim, caster_id, target, &stat, candidate, CONVERGENCE_BASE_SCALE);
+                element::proc(
+                    sim,
+                    caster_id,
+                    target,
+                    &stat,
+                    candidate,
+                    CONVERGENCE_BASE_SCALE,
+                );
             }
         } else {
             element::proc(
@@ -99,25 +84,33 @@ impl StableEffectType for SoulOfRaava {
         }
     }
 
+    /// The attack itself plus whatever the element riding it is worth.
+    ///
+    /// Which instance the AI asks is the answer to "which element": the
+    /// .data_champion's `SwitchByBuff` chain picks the one matching his
+    /// attunement, so `self.0` is always the element this shot will proc.
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
-        // Split the same way it is dealt, so the AI weighs him against both
-        // resistances rather than one.
+        let (physical, magic) = match self.0 {
+            Some(element) => element::proc_damage(caster_stat, element, CONVERGENCE_BASE_SCALE),
+            // Converged: every attack procs all four at once.
+            None => element::off_element_attack_damage(caster_stat),
+        };
         (
-            percent_of(caster_stat.attack, ATTACK_PHYSICAL_SHARE),
-            percent_of(caster_stat.attack, ATTACK_MAGIC_SHARE),
+            percent_of(caster_stat.attack, ATTACK_PHYSICAL_SHARE) + physical,
+            percent_of(caster_stat.attack, ATTACK_MAGIC_SHARE) + magic,
         )
     }
 
-    /// Nothing here roots him — the shot is already in the air by the time
-    /// this lands. Pairs with `can_use_with_move` on the attack action, which
-    /// is what actually lets him fire on the move.
-    fn can_move(&self) -> bool {
-        true
+    /// Water's proc, on the attacks that carry it.
+    fn expected_heal(&self, caster_stat: &StatV1) -> usize {
+        element::proc_heal(
+            caster_stat,
+            self.0.unwrap_or(Element::Water),
+            CONVERGENCE_BASE_SCALE,
+        )
     }
 }
 
-/// One tick of the fire burn, queued six times by [`element::proc`]. The
-/// scale rides in the input's `x` field; a zero there means an unscaled tick.
 pub struct FireBurnTick;
 
 impl StableEffectType for FireBurnTick {
@@ -147,8 +140,6 @@ impl StableEffectType for FireBurnTick {
 }
 
 // ------------------------------------------------------- skill: The Avatar Cycle
-
-/// Swaps Wan to the next element in the cycle.
 pub struct TheAvatarCycle;
 
 impl StableEffectType for TheAvatarCycle {
@@ -159,8 +150,6 @@ impl StableEffectType for TheAvatarCycle {
         caster_id: usize,
         _input: InputTargetV1,
     ) {
-        // Cycling before the first attack still advances *past* the starting
-        // element, so the sequence reads the same either way.
         let next = element::current(sim, caster_id)
             .unwrap_or(STARTING_ELEMENT)
             .next();
@@ -177,14 +166,6 @@ impl StableEffectType for TheAvatarCycle {
 }
 
 // ------------------------------------------------------- skill2: Spirit Step
-
-/// Opens the damage-banking window: movement speed now, healing later.
-///
-/// This effect only starts the window. The banking and the payout live in
-/// `match_hook::WanDamageStore`, because nothing reports damage taken to a
-/// data-declared champion — `StablePassive::on_damaged` only exists for a
-/// champion registered from Rust, and Wan is declared in JSON. The hook
-/// samples HP every tick instead.
 pub struct SpiritStep;
 
 impl SpiritStep {
@@ -203,36 +184,20 @@ impl StableEffectType for SpiritStep {
         caster_id: usize,
         _input: InputTargetV1,
     ) {
-        // Seed the ledger with his current HP, so the hook's first sample
-        // measures damage from the instant of the cast rather than from zero.
         let hp = sim.get_entity(caster_id).map_or(0, |entity| entity.hp().0);
 
         sim.add_buff(caster_id, &Self::buff());
         sim.add_buff(caster_id, &crate::match_hook::ledger_buff(0, hp));
-
-        // The dash itself is not here: it is the `RushTime` beside this effect
-        // in the .data_champion, which is the engine's own directional dash —
-        // the one Lucian and Vayne use. Moving him from Rust meant writing
-        // positions the renderer would not show until the action ended, and it
-        // could not be animated or collide properly. Declaring it hands all
-        // three to the engine, and this effect is left doing what only it can:
-        // opening the banking window.
     }
 
     fn expected_buff(&self, _caster_stat: &StatV1) -> Option<BuffV1> {
         Some(Self::buff())
     }
 
-    /// Lets the AI treat Spirit Step as the gap-closer it is, rather than as a
-    /// pure self-buff it would only ever cast standing still. The movement is
-    /// the `RushTime` beside this effect; these numbers only describe it.
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
         Some((STEP_DASH_TICKS, STEP_DASH_DISTANCE))
     }
 
-    /// The AI reads this to value the skill. The real payout depends on damage
-    /// taken during the window, which is unknowable at cast time, so quote the
-    /// window's own length as a rough stand-in for its worth.
     fn expected_heal(&self, caster_stat: &StatV1) -> usize {
         STEP_HEAL_FLAT
             + percent_of(
@@ -251,19 +216,13 @@ impl StableEffectType for SpiritStep {
 }
 
 // ------------------------------------------------- ult: Harmonic Convergence
-
-/// Eight seconds of every element at once, behind a shield.
 pub struct HarmonicConvergence;
 
 impl HarmonicConvergence {
-    /// Statless on purpose: the buff exists so `SoulOfRaava` can tell the ult
-    /// is running. The shield is applied separately, as its own layer.
     fn buff() -> BuffV1 {
         BuffV1::timed(CONVERGENCE_BUFF, CONVERGENCE_DURATION)
     }
 
-    /// `StatV1::hp` is the caster's max HP including items and buffs, so the
-    /// health share grows with what he actually built.
     fn shield_amount(caster_stat: &StatV1) -> usize {
         CONVERGENCE_SHIELD
             + percent_of(caster_stat.magic_power, CONVERGENCE_SHIELD_AP_RATIO)
@@ -289,17 +248,16 @@ impl StableEffectType for HarmonicConvergence {
         Some(Self::buff())
     }
 
-    /// The ult is an eight-second damage window that happens to come with a
-    /// shield, but quoting only the shield made it read as a panic button —
-    /// something to hold until his health was low, which is the last moment
-    /// it is worth anything. Quoting what it adds to every basic attack in
-    /// that window is what makes the AI open a fight with it instead.
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
-        element::off_element_attack_damage(caster_stat)
+        element::convergence_damage(caster_stat)
     }
 
     fn expected_shield(&self, caster_stat: &StatV1) -> usize {
         Self::shield_amount(caster_stat)
+    }
+
+    fn expected_heal(&self, caster_stat: &StatV1) -> usize {
+        element::convergence_heal(caster_stat)
     }
 
     fn on_caster(&self) -> bool {

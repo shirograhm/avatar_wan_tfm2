@@ -1,11 +1,3 @@
-//! The four elements Wan cycles through, and the on-hit proc each one grants.
-//!
-//! The active element is stored as a named, statless buff on Wan's entity
-//! rather than in Rust state. Effects receive `&self` and matches simulate in
-//! parallel on several threads, so there is no sound place to hang per-entity
-//! state on the mod side — but a buff is per-entity, deterministic, visible to
-//! every callback, and cleaned up by the engine.
-
 use mod_api_stable::*;
 
 use crate::constants::*;
@@ -18,8 +10,6 @@ pub enum Element {
     Fire,
 }
 
-/// The Avatar Cycle walks this ring in order. Wan starts on [`STARTING_ELEMENT`],
-/// so his first cast moves him to the element after it.
 pub const CYCLE: [Element; 4] = [Element::Air, Element::Water, Element::Earth, Element::Fire];
 
 impl Element {
@@ -55,9 +45,6 @@ pub fn current(sim: &StableSim<'_>, entity: usize) -> Option<Element> {
         .find_map(|buff| Element::from_buff_name(buff.name()))
 }
 
-/// Switches Wan to `element`, dropping whichever one he was on. Removing all
-/// four rather than just the previous one keeps a single element attuned even
-/// if something else ever applied one.
 pub fn attune(sim: &mut StableSim<'_>, entity: usize, element: Element) {
     for stale in CYCLE {
         sim.entity_remove_buff(entity, stale.buff_name());
@@ -65,7 +52,6 @@ pub fn attune(sim: &mut StableSim<'_>, entity: usize, element: Element) {
     sim.add_buff(entity, &BuffV1::named(element.buff_name()));
 }
 
-/// How many stacks of `name` the entity is carrying.
 pub fn buff_stacks(sim: &StableSim<'_>, entity: usize, name: &str) -> usize {
     let Some(entity) = sim.get_entity(entity) else {
         return 0;
@@ -80,9 +66,6 @@ pub fn has_buff(sim: &StableSim<'_>, entity: usize, name: &str) -> bool {
     buff_stacks(sim, entity, name) > 0
 }
 
-/// Fires one element's on-hit proc. `scale` is a percent — Harmonic
-/// Convergence passes 150 for the element Wan is actually channeling and 100
-/// for the other three.
 pub fn proc(
     sim: &mut StableSim<'_>,
     caster: usize,
@@ -92,8 +75,6 @@ pub fn proc(
     scale: usize,
 ) {
     match element {
-        // Stacking attack speed, capped. Each stack runs its own timer rather
-        // than refreshing, since a buff layer cannot be extended once applied.
         Element::Air => {
             if buff_stacks(sim, caster, AIR_STACK_BUFF) >= AIR_MAX_STACKS {
                 return;
@@ -103,61 +84,40 @@ pub fn proc(
             sim.add_buff(caster, &haste);
         }
 
-        // A share of what he is missing, not a flat amount: worth nothing at
-        // full health and most at the point he is about to die. Read from the
-        // entity rather than `caster_stat`, which only carries max HP.
         Element::Water => {
             let Some((current, max)) = sim.get_entity(caster).map(|entity| entity.hp()) else {
                 return;
             };
-            let heal = percent_of(max.saturating_sub(current), WATER_MISSING_HP_PERCENT);
-            sim.heal(caster, caster, percent_of(heal, scale));
+            sim.heal(
+                caster,
+                caster,
+                water_heal(max.saturating_sub(current), scale),
+            );
 
-            // Drawn on the target rather than on Wan, even though the heal
-            // lands on him: it marks where the water actually struck, which is
-            // what the projectile is pointing at. Layered like Earth's splash
-            // and Fire's flame — a second hit inside the first's run time adds
-            // its own copy on its own timer instead of restarting the burst.
             sim.add_buff(
                 target,
                 &BuffV1::timed(WATER_SPLASH_VFX_BUFF, WATER_SPLASH_VFX_TICKS),
             );
         }
 
-        // Splashes off the struck target onto everything around it — the
-        // target itself is spared, since the attack already hit it — so Earth
-        // is the wave-clear element.
         Element::Earth => {
             let (physical, magic) = earth_splash_damage(caster_stat, scale);
             for splashed in crate::util::enemies_near(sim, caster, target, EARTH_RADIUS) {
                 sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::BaseAttack);
             }
 
-            // One burst, on the target the attack struck — it is the centre the
-            // splash radiates from, so drawing a copy on every enemy caught in
-            // it would read as several impacts instead of one. Note this is the
-            // one enemy the splash does *not* damage.
-            //
-            // Layered on purpose: a second splash inside the first's run time
-            // adds its own copy rather than restarting the animation, so rapid
-            // hits read as overlapping impacts. Each stack runs its own timer,
-            // the same way Air's do.
             sim.add_buff(
                 target,
                 &BuffV1::timed(EARTH_SPLASH_VFX_BUFF, EARTH_SPLASH_VFX_TICKS),
             );
         }
 
-        // The burn is queued as repeating ticks of a registered native effect;
-        // see `effects::FireBurnTick`. A queued effect carries no payload of
-        // its own, so `scale` rides along in the input's unused `x` field —
-        // both ends of that channel live in this mod.
         Element::Fire => {
-            // Towers do not burn. A structure standing still under a damage
-            // over time it cannot walk out of turns Fire into the siege
-            // element by accident, which is Earth's job — and the flame drawn
-            // on a tower reads as a bug besides.
-            if sim.get_entity(target).is_some_and(|entity| entity.is_tower()) {
+            // Towers do not burn
+            if sim
+                .get_entity(target)
+                .is_some_and(|entity| entity.is_tower())
+            {
                 return;
             }
 
@@ -175,20 +135,11 @@ pub fn proc(
                 );
             }
 
-            // Layered, like Earth's splash and like the burn itself: a second
-            // application stacks its own flame on its own timer rather than
-            // refreshing, so the fire is showing exactly while ticks are still
-            // queued.
             sim.add_buff(target, &BuffV1::timed(BURN_VFX_BUFF, BURN_VFX_TICKS));
         }
     }
 }
 
-/// What each enemy caught in Earth's splash takes, as (physical, magic).
-///
-/// A share of the attack that produced it, split down the middle the same way
-/// [`effects::SoulOfRaava`] splits the attack itself — so armour and magic
-/// resist each answer only half of the splash, exactly as they do the hit.
 pub fn earth_splash_damage(caster_stat: &StatV1, scale: usize) -> (usize, usize) {
     let total = percent_of(percent_of(caster_stat.attack, EARTH_ATTACK_SHARE), scale);
     (
@@ -197,22 +148,53 @@ pub fn earth_splash_damage(caster_stat: &StatV1, scale: usize) -> (usize, usize)
     )
 }
 
-/// What one basic attack gains from the three elements Wan is *not* attuned
-/// to — the offensive half of Harmonic Convergence, as (physical, magic).
-///
-/// Only Earth and Fire carry damage; Air and Water are worth real value but
-/// not in a form `expected_damage` can express, so this understates the ult.
-/// It also counts both Earth and Fire even though one of them may be the
-/// element he is already on, which overstates it by one proc. Full strength
-/// either way, since the ult no longer dilutes what it adds.
+pub fn proc_damage(caster_stat: &StatV1, element: Element, scale: usize) -> (usize, usize) {
+    match element {
+        Element::Air | Element::Water => (0, 0),
+        Element::Earth => earth_splash_damage(caster_stat, scale),
+        Element::Fire => (0, burn_tick_damage(caster_stat, scale) * BURN_TICKS),
+    }
+}
+
+pub fn proc_heal(caster_stat: &StatV1, element: Element, scale: usize) -> usize {
+    match element {
+        Element::Water => water_heal(
+            percent_of(caster_stat.hp, EXPECTED_MISSING_HP_PERCENT),
+            scale,
+        ),
+        _ => 0,
+    }
+}
+
+/// Basic attacks Harmonic Convergence is worth.
+pub fn convergence_attacks() -> usize {
+    // Rate rather than interval, so the division rounds once at the end
+    // instead of once per attack.
+    (CONVERGENCE_DURATION * CONVERGENCE_ATTACK_SPEED_PERCENT) / (ATTACK_COOLTIME * 100)
+}
+
+/// Heals over the whole of Harmonic Convergence.
+pub fn convergence_heal(caster_stat: &StatV1) -> usize {
+    proc_heal(caster_stat, Element::Water, CONVERGENCE_BASE_SCALE) * convergence_attacks()
+}
+
+/// Damage over the whole of Harmonic Convergence.
+pub fn convergence_damage(caster_stat: &StatV1) -> (usize, usize) {
+    let (physical, magic) = off_element_attack_damage(caster_stat);
+    let attacks = convergence_attacks();
+    (physical * attacks, magic * attacks)
+}
+
 pub fn off_element_attack_damage(caster_stat: &StatV1) -> (usize, usize) {
     let (physical, earth_magic) = earth_splash_damage(caster_stat, CONVERGENCE_BASE_SCALE);
     let burn = burn_tick_damage(caster_stat, CONVERGENCE_BASE_SCALE) * BURN_TICKS;
     (physical, earth_magic + burn)
 }
 
-/// Damage of a single burn tick, recomputed from Wan's stats when it lands so
-/// that items bought mid-burn are accounted for.
+pub fn water_heal(missing_hp: usize, scale: usize) -> usize {
+    percent_of(percent_of(missing_hp, WATER_MISSING_HP_PERCENT), scale)
+}
+
 pub fn burn_tick_damage(caster_stat: &StatV1, scale: usize) -> usize {
     let total = BURN_DAMAGE
         + percent_of(caster_stat.attack, BURN_AD_RATIO)

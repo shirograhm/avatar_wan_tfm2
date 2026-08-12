@@ -43,25 +43,24 @@
     "duration": 24,
     "cooltime": 60,
     "start_timing": 14,
-    "cancelable": true,
-    "can_use_with_move": true,
+    "cancelable": false,
     "range": 60000,
     "casting_type": "Targeting",
     "casting_target": "Enemy",
     "attack_type": "BaseAttack",
     "effect": {
       "type": "SwitchByBuff",
-      "buff_name": "wan_element_air",
+      "buff_name": "wan_harmonic_convergence",
       "effect_buff": {
         "type": "TargetProjectile",
         "speed": 5000,
-        "name": "wan_attack_air",
+        "name": "wan_attack_convergence",
         "applied_target": "Enemy",
         "applied_effects": [
           {
             "effect": {
               "type": "Native",
-              "effect_ref": "avatar_wan_attack_hit_air"
+              "effect_ref": "avatar_wan_attack_hit_convergence"
             },
             "casting_type": "Targeting"
           }
@@ -69,17 +68,17 @@
       },
       "effect_none": {
         "type": "SwitchByBuff",
-        "buff_name": "wan_element_water",
+        "buff_name": "wan_element_air",
         "effect_buff": {
           "type": "TargetProjectile",
           "speed": 5000,
-          "name": "wan_attack_water",
+          "name": "wan_attack_air",
           "applied_target": "Enemy",
           "applied_effects": [
             {
               "effect": {
                 "type": "Native",
-                "effect_ref": "avatar_wan_attack_hit_water"
+                "effect_ref": "avatar_wan_attack_hit_air"
               },
               "casting_type": "Targeting"
             }
@@ -87,36 +86,55 @@
         },
         "effect_none": {
           "type": "SwitchByBuff",
-          "buff_name": "wan_element_earth",
+          "buff_name": "wan_element_water",
           "effect_buff": {
             "type": "TargetProjectile",
             "speed": 5000,
-            "name": "wan_attack_earth",
+            "name": "wan_attack_water",
             "applied_target": "Enemy",
             "applied_effects": [
               {
                 "effect": {
                   "type": "Native",
-                  "effect_ref": "avatar_wan_attack_hit_earth"
+                  "effect_ref": "avatar_wan_attack_hit_water"
                 },
                 "casting_type": "Targeting"
               }
             ]
           },
           "effect_none": {
-            "type": "TargetProjectile",
-            "speed": 5000,
-            "name": "wan_attack_fire",
-            "applied_target": "Enemy",
-            "applied_effects": [
-              {
-                "effect": {
-                  "type": "Native",
-                  "effect_ref": "avatar_wan_attack_hit_fire"
-                },
-                "casting_type": "Targeting"
-              }
-            ]
+            "type": "SwitchByBuff",
+            "buff_name": "wan_element_earth",
+            "effect_buff": {
+              "type": "TargetProjectile",
+              "speed": 5000,
+              "name": "wan_attack_earth",
+              "applied_target": "Enemy",
+              "applied_effects": [
+                {
+                  "effect": {
+                    "type": "Native",
+                    "effect_ref": "avatar_wan_attack_hit_earth"
+                  },
+                  "casting_type": "Targeting"
+                }
+              ]
+            },
+            "effect_none": {
+              "type": "TargetProjectile",
+              "speed": 5000,
+              "name": "wan_attack_fire",
+              "applied_target": "Enemy",
+              "applied_effects": [
+                {
+                  "effect": {
+                    "type": "Native",
+                    "effect_ref": "avatar_wan_attack_hit_fire"
+                  },
+                  "casting_type": "Targeting"
+                }
+              ]
+            }
           }
         }
       }
@@ -253,9 +271,11 @@
       "z": 0
     },
     {
-      "type": "Sprite",
+      "type": "Animated",
       "name": "wan_attack_water",
-      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_water"
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_water",
+      "tag": "water",
+      "z": 0
     },
     {
       "type": "Sprite",
@@ -267,6 +287,20 @@
       "name": "wan_attack_fire",
       "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_fire",
       "tag": "fire",
+      "z": 0
+    },
+    {
+      "type": "Animated",
+      "name": "wan_attack_convergence",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_convergence",
+      "tag": "convergence",
+      "z": 0
+    },
+    {
+      "type": "Animated",
+      "name": "wan_attack_convergence_comet",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_convergence_comet",
+      "tag": "convergence",
       "z": 0
     }
   ]
