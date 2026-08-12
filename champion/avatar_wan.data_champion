@@ -278,9 +278,11 @@
       "z": 0
     },
     {
-      "type": "Sprite",
+      "type": "Animated",
       "name": "wan_attack_earth",
-      "sprite": "asset/avatar_wan_tfm2/effects/wan_projectile_earth"
+      "anim": "asset/avatar_wan_tfm2/effects/wan_projectile_earth",
+      "tag": "earth",
+      "z": 0
     },
     {
       "type": "Animated",
