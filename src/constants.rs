@@ -26,14 +26,14 @@ pub const WATER_MISSING_HP_PERCENT: usize = 5;
 pub const WATER_SPLASH_VFX_BUFF: &str = "wan_water_splash";
 pub const WATER_SPLASH_VFX_TICKS: usize = 18;
 
-pub const EARTH_ATTACK_SHARE: usize = 50;
+pub const EARTH_ATTACK_SHARE: usize = 40;
 pub const EARTH_RADIUS: u64 = 40_000;
 pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
 pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
 pub const BURN_DAMAGE: usize = 10;
-pub const BURN_AD_RATIO: usize = 15;
-pub const BURN_AP_RATIO: usize = 75;
+pub const BURN_AD_RATIO: usize = 10;
+pub const BURN_AP_RATIO: usize = 55;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
 pub const BURN_VFX_BUFF: &str = "wan_fire_burn";
