@@ -128,9 +128,7 @@ impl StableEffectType for FireBurnTick {
         };
         let stat = stat_of(sim, caster_id);
         let damage = element::burn_tick_damage(&stat, scale);
-        // Burn ticks are Fire's bonus, so they count as skill damage rather
-        // than as a DoT.
-        sim.deal_damage(caster_id, input.target_id, 0, damage, AttackTypeV1::Skill);
+        sim.deal_damage(caster_id, input.target_id, 0, damage, AttackTypeV1::Dot);
     }
 
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {

@@ -103,9 +103,14 @@ pub fn proc(
         Element::Earth => {
             let (physical, magic) = earth_splash_damage(caster_stat, scale);
             for splashed in crate::util::enemies_near(sim, caster, target, EARTH_RADIUS) {
-                // The splash is the element's bonus, not the attack that
-                // carried it, so it lands as skill damage.
-                sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::Skill);
+                // Towers do not take the splash, the same way they do not burn.
+                if sim
+                    .get_entity(splashed)
+                    .is_some_and(|entity| entity.is_tower())
+                {
+                    continue;
+                }
+                sim.deal_damage(caster, splashed, physical, magic, AttackTypeV1::BaseAttack);
             }
 
             sim.add_buff(
@@ -130,7 +135,7 @@ pub fn proc(
             for tick in 1..=BURN_TICKS {
                 sim.queue_effect(
                     crate::effects::FIRE_BURN_TICK,
-                    AttackTypeV1::Skill,
+                    AttackTypeV1::Dot,
                     caster,
                     &input,
                     tick * BURN_TICK_INTERVAL,

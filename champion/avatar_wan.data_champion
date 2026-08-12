@@ -189,7 +189,7 @@
           "speed": 3000,
           "tick": 20,
           "range": 60000,
-          "casting_target": "Enemy",
+          "casting_target": "None",
           "penetrate": true,
           "applied_effects": []
         },
@@ -259,7 +259,7 @@
       "name": "wan_harmonic_convergence",
       "anim": "asset/avatar_wan_tfm2/effects/wan_ult_area",
       "tag": "area",
-      "z": -1
+      "z": 1
     }
   ],
   "view_projectiles": [

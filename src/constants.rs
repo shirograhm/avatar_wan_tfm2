@@ -18,8 +18,8 @@ pub const ATTACK_COOLTIME: usize = 50;
 pub const STARTING_ELEMENT: Element = Element::Fire;
 
 pub const AIR_STACK_BUFF: &str = "wan_air_stack";
-pub const AIR_ATTACK_SPEED_PERCENT: i32 = 5;
-pub const AIR_DURATION: usize = ticks!(2.0) as usize;
+pub const AIR_ATTACK_SPEED_PERCENT: i32 = 8;
+pub const AIR_DURATION: usize = ticks!(4.0) as usize;
 pub const AIR_MAX_STACKS: usize = 4;
 
 pub const WATER_MISSING_HP_PERCENT: usize = 5;
@@ -33,7 +33,7 @@ pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
 pub const BURN_DAMAGE: usize = 10;
 pub const BURN_AD_RATIO: usize = 10;
-pub const BURN_AP_RATIO: usize = 55;
+pub const BURN_AP_RATIO: usize = 35;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
 pub const BURN_VFX_BUFF: &str = "wan_fire_burn";
@@ -54,8 +54,8 @@ pub const STEP_DASH_TICKS: usize = 20;
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
 pub const CONVERGENCE_DURATION: usize = ticks!(8.0) as usize;
 pub const CONVERGENCE_SHIELD: usize = 200;
-pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 100;
-pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 10;
+pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 80;
+pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 8;
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
 // How hurt to assume he is when valuing Water's heal — used by the basic
 // attack and by the ult, since neither can read current HP.
