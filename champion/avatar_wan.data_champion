@@ -53,7 +53,7 @@
       "buff_name": "wan_harmonic_convergence",
       "effect_buff": {
         "type": "TargetProjectile",
-        "speed": 5000,
+        "speed": 6000,
         "name": "wan_attack_convergence",
         "applied_target": "Enemy",
         "applied_effects": [
@@ -71,7 +71,7 @@
         "buff_name": "wan_element_air",
         "effect_buff": {
           "type": "TargetProjectile",
-          "speed": 5000,
+          "speed": 6000,
           "name": "wan_attack_air",
           "applied_target": "Enemy",
           "applied_effects": [
@@ -107,7 +107,7 @@
             "buff_name": "wan_element_earth",
             "effect_buff": {
               "type": "TargetProjectile",
-              "speed": 5000,
+              "speed": 4500,
               "name": "wan_attack_earth",
               "applied_target": "Enemy",
               "applied_effects": [
@@ -122,7 +122,7 @@
             },
             "effect_none": {
               "type": "TargetProjectile",
-              "speed": 5000,
+              "speed": 5500,
               "name": "wan_attack_fire",
               "applied_target": "Enemy",
               "applied_effects": [
