@@ -2,6 +2,7 @@ use crate::element::Element;
 
 // ------------------------------------------------ Defaults
 pub const MOD_ID: &str = "avatar_wan_tfm2";
+pub const CHAMPION_KEY: &str = "avatar_wan";
 pub const TICKS_PER_SECOND: f64 = 60.0;
 macro_rules! ticks {
     ($num:expr) => {

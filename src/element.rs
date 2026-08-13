@@ -39,10 +39,23 @@ impl Element {
 
 /// The element Wan is currently in tune with, if any.
 pub fn current(sim: &StableSim<'_>, entity: usize) -> Option<Element> {
-    let entity = sim.get_entity(entity)?;
+    current_of(&sim.get_entity(entity)?)
+}
+
+/// `current`, for when the caller already holds the entity view.
+pub fn current_of(entity: &StableEntity<'_, '_>) -> Option<Element> {
     (0..entity.buff_count())
         .filter_map(|index| entity.buff_at(index))
         .find_map(|buff| Element::from_buff_name(buff.name()))
+}
+
+/// Whether this entity is Wan. Hosts differ on whether `entity_name` hands
+/// back the champion key or the display name, so both spellings are accepted.
+pub fn is_wan(entity: &StableEntity<'_, '_>) -> bool {
+    entity.is_champion()
+        && entity
+            .name()
+            .is_some_and(|name| name.trim().to_ascii_lowercase().replace(' ', "_") == CHAMPION_KEY)
 }
 
 pub fn attune(sim: &mut StableSim<'_>, entity: usize, element: Element) {

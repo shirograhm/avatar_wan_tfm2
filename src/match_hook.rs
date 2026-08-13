@@ -35,8 +35,29 @@ struct Pending {
     open: bool,
 }
 
+/// Wan is attuned from the moment he is on the field, so the element overlay
+/// is never blank. Runs every tick rather than only at match start so a
+/// respawn, which drops his buffs, re-attunes him too.
+fn attune_unattuned(sim: &mut StableSim<'_>) {
+    let unattuned: Vec<usize> = (0..sim.entity_count())
+        .filter_map(|index| sim.entity_at(index))
+        .filter(|entity| {
+            entity.is_alive()
+                && crate::element::is_wan(entity)
+                && crate::element::current_of(entity).is_none()
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    for entity in unattuned {
+        crate::element::attune(sim, entity, STARTING_ELEMENT);
+    }
+}
+
 impl StableMatchHook for WanDamageStore {
     fn on_match_tick(&self, sim: &mut StableSim<'_>, _rng_seed: u64) {
+        attune_unattuned(sim);
+
         let pending: Vec<Pending> = (0..sim.entity_count())
             .filter_map(|index| sim.entity_at(index))
             .filter(|entity| entity.is_alive())

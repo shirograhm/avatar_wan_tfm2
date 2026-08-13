@@ -260,6 +260,34 @@
       "anim": "asset/avatar_wan_tfm2/effects/wan_ult_area",
       "tag": "area",
       "z": 1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_element_air",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_attack_type_air",
+      "tag": "air",
+      "z": -1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_element_water",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_attack_type_water",
+      "tag": "water",
+      "z": -1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_element_earth",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_attack_type_earth",
+      "tag": "earth",
+      "z": -1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_element_fire",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_attack_type_fire",
+      "tag": "fire",
+      "z": -1
     }
   ],
   "view_projectiles": [
