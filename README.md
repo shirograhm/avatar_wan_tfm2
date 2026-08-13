@@ -16,7 +16,7 @@ updates and builds with any Rust toolchain — no pinned nightly.
   - **Earth:** 50% of the attack's own damage, split physical/magic the same
     way, splashed to enemies within 40,000 units of the target — the struck
     target itself excluded, since the attack already hit it.
-- **Skill 2 (Lv. 3) — Spirit Step.** Dash forward 60,000 units, then for 4s
+- **Skill 2 (Lv. 3) — Spirit Step.** Dash forward 60,000 units, then for 2s
   bank 80% of damage taken and gain +20% Movement Speed; when it expires,
   heal for 35 + 80% of the banked amount.
 - **Ult — Harmonic Convergence.** 8s behind a 400 (+80% AP) (+8% HP) shield;

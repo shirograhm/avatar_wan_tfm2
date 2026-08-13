@@ -43,7 +43,7 @@ pub const BURN_VFX_TICKS: usize = BURN_TICKS * BURN_TICK_INTERVAL;
 // ------------------------------------------------ Spirit Step
 pub const STEP_BUFF: &str = "wan_spirit_step";
 pub const STEP_MOVE_SPEED_PERCENT: i32 = 20;
-pub const STEP_BUFF_DURATION: usize = ticks!(4.0) as usize;
+pub const STEP_BUFF_DURATION: usize = ticks!(2.0) as usize;
 pub const STEP_STORE_PERCENT: usize = 80;
 pub const STEP_HEAL_PERCENT: usize = 80;
 pub const STEP_HEAL_FLAT: usize = 35;
