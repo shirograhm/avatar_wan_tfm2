@@ -41,7 +41,7 @@
     "action_name": "attack",
     "description": "#asset/base/text/champion?description.avatar_wan.attack",
     "duration": 24,
-    "cooltime": 65,
+    "cooltime": 70,
     "start_timing": 14,
     "cancelable": false,
     "range": 70000,
