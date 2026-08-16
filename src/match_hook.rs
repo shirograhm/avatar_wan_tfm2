@@ -54,9 +54,78 @@ fn attune_unattuned(sim: &mut StableSim<'_>) {
     }
 }
 
+/// Takedowns — kills and assists alike — the given player was credited with on
+/// the previous tick. Reading the tick just gone rather than the current one
+/// means each kill is counted exactly once no matter whether the host appends
+/// to the log before or after this hook runs.
+fn takedowns_last_tick(sim: &StableSim<'_>, team: usize, lane: u32) -> usize {
+    let Some(previous) = sim.tick().checked_sub(1) else {
+        return 0;
+    };
+
+    (0..sim.kill_log_count())
+        .filter_map(|index| sim.kill_log_at(index))
+        .filter(|log| log.tick == previous && log.killer_team == team)
+        .filter(|log| {
+            let assists = (log.assist_count as usize).min(log.assist_positions.len());
+            log.killer_position == lane || log.assist_positions[..assists].contains(&lane)
+        })
+        .count()
+}
+
+fn convergence_remaining(entity: &StableEntity<'_, '_>) -> Option<usize> {
+    (0..entity.buff_count())
+        .filter_map(|i| entity.buff_at(i))
+        .find(|buff| buff.name() == CONVERGENCE_BUFF)
+        .map(|buff| buff.duration_tick)
+}
+
+/// A takedown while Harmonic Convergence is up buys Wan more of it. The buff
+/// carries no per-cast state, so the extension is a remove-and-re-add with the
+/// leftover duration rolled in.
+fn extend_convergence_on_takedown(sim: &mut StableSim<'_>) {
+    let mut extended: Vec<(usize, usize, usize)> = Vec::new();
+
+    for index in 0..sim.player_count() {
+        let Some(player) = sim.player_at(index) else {
+            continue;
+        };
+        let Some(champion) = player.champion() else {
+            continue;
+        };
+        if !champion.is_alive() || !crate::element::is_wan(&champion) {
+            continue;
+        }
+        let (Some(lane), Some(remaining)) = (player.lane(), convergence_remaining(&champion)) else {
+            continue;
+        };
+
+        let takedowns = takedowns_last_tick(sim, player.team(), lane.code());
+        if takedowns > 0 {
+            let bonus = takedowns * CONVERGENCE_TAKEDOWN_EXTENSION;
+            extended.push((champion.id(), remaining + bonus, champion.shield()));
+        }
+    }
+
+    // The shield rides the same clock, so it is rebuilt alongside the buff:
+    // whatever is left of it is re-granted for the new duration. Layers are not
+    // individually addressable, so this sweeps up any other shield on him too —
+    // in practice the ult's is the only one Wan carries.
+    for (entity, duration, shield) in extended {
+        sim.entity_remove_buff(entity, CONVERGENCE_BUFF);
+        sim.add_buff(entity, &crate::effects::convergence_buff(duration));
+
+        if shield > 0 {
+            sim.entity_clear_shield(entity);
+            sim.entity_add_shield(entity, shield, duration);
+        }
+    }
+}
+
 impl StableMatchHook for WanDamageStore {
     fn on_match_tick(&self, sim: &mut StableSim<'_>, _rng_seed: u64) {
         attune_unattuned(sim);
+        extend_convergence_on_takedown(sim);
 
         let pending: Vec<Pending> = (0..sim.entity_count())
             .filter_map(|index| sim.entity_at(index))

@@ -19,11 +19,12 @@ pub const ATTACK_COOLTIME: usize = 50;
 pub const STARTING_ELEMENT: Element = Element::Fire;
 
 pub const AIR_STACK_BUFF: &str = "wan_air_stack";
-pub const AIR_ATTACK_SPEED_PERCENT: i32 = 8;
+pub const AIR_MOVE_SPEED_PERCENT: i32 = 6;
 pub const AIR_DURATION: usize = ticks!(4.0) as usize;
 pub const AIR_MAX_STACKS: usize = 4;
 
-pub const WATER_MISSING_HP_PERCENT: usize = 5;
+pub const WATER_HEAL_FLAT: usize = 3;
+pub const WATER_MISSING_HP_PERCENT: usize = 3;
 pub const WATER_SPLASH_VFX_BUFF: &str = "wan_water_splash";
 pub const WATER_SPLASH_VFX_TICKS: usize = 18;
 
@@ -32,9 +33,8 @@ pub const EARTH_RADIUS: u64 = 40_000;
 pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
 pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
-pub const BURN_DAMAGE: usize = 10;
-pub const BURN_AD_RATIO: usize = 10;
-pub const BURN_AP_RATIO: usize = 35;
+pub const BURN_DAMAGE: usize = 9;
+pub const BURN_AP_RATIO: usize = 30;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
 pub const BURN_VFX_BUFF: &str = "wan_fire_burn";
@@ -42,32 +42,32 @@ pub const BURN_VFX_TICKS: usize = BURN_TICKS * BURN_TICK_INTERVAL;
 
 // ------------------------------------------------ Spirit Step
 pub const STEP_BUFF: &str = "wan_spirit_step";
-pub const STEP_MOVE_SPEED_PERCENT: i32 = 20;
-pub const STEP_BUFF_DURATION: usize = ticks!(2.0) as usize;
+pub const STEP_ATTACK_SPEED_PERCENT: i32 = 10;
+/// Attack speed on top of the flat bonus, as a percent of AD — 0.03% attack
+/// speed per point, so 500 AD is worth another 15%.
+pub const STEP_ATTACK_SPEED_AD_RATIO: usize = 3;
+pub const STEP_BUFF_DURATION: usize = ticks!(3.0) as usize;
 pub const STEP_STORE_PERCENT: usize = 80;
 pub const STEP_HEAL_PERCENT: usize = 80;
-pub const STEP_HEAL_FLAT: usize = 35;
+pub const STEP_HEAL_FLAT: usize = 30;
 pub const STEP_STORE_PREFIX: &str = "wan_step_store";
 pub const STEP_DASH_DISTANCE: u64 = 60_000;
 pub const STEP_DASH_TICKS: usize = 20;
 
 // ------------------------------------------------ Harmonic Convergence
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
-pub const CONVERGENCE_DURATION: usize = ticks!(8.0) as usize;
+pub const CONVERGENCE_DURATION: usize = ticks!(6.0) as usize;
+/// Matches the buff's base duration; takedown extensions lengthen both.
+pub const CONVERGENCE_SHIELD_DURATION: usize = ticks!(6.0) as usize;
 pub const CONVERGENCE_SHIELD: usize = 200;
-pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 80;
-pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 8;
+pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 60;
+pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 6;
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
+/// Duration each takedown — a kill or an assist — adds to an active ult.
+pub const CONVERGENCE_TAKEDOWN_EXTENSION: usize = ticks!(1.5) as usize;
 // How hurt to assume he is when valuing Water's heal — used by the basic
 // attack and by the ult, since neither can read current HP.
 pub const EXPECTED_MISSING_HP_PERCENT: usize = 25;
-/// Attack speed the ult itself grants for its duration.
-pub const CONVERGENCE_ATTACK_SPEED_BONUS: i32 = 20;
-/// Total attack speed to assume while converged: the ult's own bonus on top of
-/// Air at max stacks, which he is attacking often enough to hold.
-pub const CONVERGENCE_ATTACK_SPEED_PERCENT: usize = 100
-    + CONVERGENCE_ATTACK_SPEED_BONUS as usize
-    + AIR_MAX_STACKS * AIR_ATTACK_SPEED_PERCENT as usize;
 
 pub fn percent_of(value: usize, percent: usize) -> usize {
     (value * percent) / 100

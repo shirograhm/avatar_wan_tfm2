@@ -16,7 +16,7 @@
     "asset/avatar_wan_tfm2/icons/avatar_wan_ult"
   ],
   "stat": {
-    "attack": 67,
+    "attack": 62,
     "magic_power": 6,
     "hp": 760,
     "defence": 22,
@@ -27,7 +27,7 @@
     "crit_chance": 0
   },
   "growth": {
-    "attack": 7,
+    "attack": 6,
     "magic_power": 12,
     "hp": 82,
     "defence": 7,
@@ -41,10 +41,10 @@
     "action_name": "attack",
     "description": "#asset/base/text/champion?description.avatar_wan.attack",
     "duration": 24,
-    "cooltime": 50,
+    "cooltime": 65,
     "start_timing": 14,
     "cancelable": false,
-    "range": 60000,
+    "range": 70000,
     "casting_type": "Targeting",
     "casting_target": "Enemy",
     "attack_type": "BaseAttack",
@@ -170,7 +170,7 @@
     "action_name": "skill2",
     "description": "#asset/base/text/champion?description.avatar_wan.skill2",
     "duration": 20,
-    "cooltime": 900,
+    "cooltime": 720,
     "start_timing": 1,
     "cancelable": false,
     "range": 60000,
@@ -227,8 +227,8 @@
     {
       "type": "Animation",
       "name": "wan_spirit_step_streak",
-      "anim": "asset/avatar_wan_tfm2/aseprite_resources/champions/avatar_wan",
-      "tag": "skill1_effect",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_spirit_step_streak",
+      "tag": "streak",
       "z": -1
     }
   ],

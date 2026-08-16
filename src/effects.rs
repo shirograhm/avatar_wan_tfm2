@@ -169,9 +169,10 @@ impl StableEffectType for TheAvatarCycle {
 pub struct SpiritStep;
 
 impl SpiritStep {
-    fn buff() -> BuffV1 {
+    fn buff(caster_stat: &StatV1) -> BuffV1 {
         let mut buff = BuffV1::timed(STEP_BUFF, STEP_BUFF_DURATION);
-        buff.move_speed_mult = STEP_MOVE_SPEED_PERCENT;
+        buff.attack_speed_mult = STEP_ATTACK_SPEED_PERCENT
+            + percent_of(caster_stat.attack, STEP_ATTACK_SPEED_AD_RATIO) as i32;
         buff
     }
 }
@@ -185,13 +186,14 @@ impl StableEffectType for SpiritStep {
         _input: InputTargetV1,
     ) {
         let hp = sim.get_entity(caster_id).map_or(0, |entity| entity.hp().0);
+        let stat = stat_of(sim, caster_id);
 
-        sim.add_buff(caster_id, &Self::buff());
+        sim.add_buff(caster_id, &Self::buff(&stat));
         sim.add_buff(caster_id, &crate::match_hook::ledger_buff(0, hp));
     }
 
-    fn expected_buff(&self, _caster_stat: &StatV1) -> Option<BuffV1> {
-        Some(Self::buff())
+    fn expected_buff(&self, caster_stat: &StatV1) -> Option<BuffV1> {
+        Some(Self::buff(caster_stat))
     }
 
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
@@ -218,11 +220,15 @@ impl StableEffectType for SpiritStep {
 // ------------------------------------------------- ult: Harmonic Convergence
 pub struct HarmonicConvergence;
 
+/// The ult buff with an explicit duration, so takedowns can re-add it with
+/// time left over instead of rebuilding the stat block by hand.
+pub fn convergence_buff(ticks: usize) -> BuffV1 {
+    BuffV1::timed(CONVERGENCE_BUFF, ticks)
+}
+
 impl HarmonicConvergence {
     fn buff() -> BuffV1 {
-        let mut buff = BuffV1::timed(CONVERGENCE_BUFF, CONVERGENCE_DURATION);
-        buff.attack_speed_mult = CONVERGENCE_ATTACK_SPEED_BONUS;
-        buff
+        convergence_buff(CONVERGENCE_DURATION)
     }
 
     fn shield_amount(caster_stat: &StatV1) -> usize {
@@ -243,7 +249,11 @@ impl StableEffectType for HarmonicConvergence {
         let stat = stat_of(sim, caster_id);
 
         sim.add_buff(caster_id, &Self::buff());
-        sim.entity_add_shield(caster_id, Self::shield_amount(&stat), CONVERGENCE_DURATION);
+        sim.entity_add_shield(
+            caster_id,
+            Self::shield_amount(&stat),
+            CONVERGENCE_SHIELD_DURATION,
+        );
     }
 
     fn expected_buff(&self, _caster_stat: &StatV1) -> Option<BuffV1> {

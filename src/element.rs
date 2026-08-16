@@ -92,9 +92,9 @@ pub fn proc(
             if buff_stacks(sim, caster, AIR_STACK_BUFF) >= AIR_MAX_STACKS {
                 return;
             }
-            let mut haste = BuffV1::timed(AIR_STACK_BUFF, AIR_DURATION);
-            haste.attack_speed_mult = percent_of(AIR_ATTACK_SPEED_PERCENT as usize, scale) as i32;
-            sim.add_buff(caster, &haste);
+            let mut swiftness = BuffV1::timed(AIR_STACK_BUFF, AIR_DURATION);
+            swiftness.move_speed_mult = percent_of(AIR_MOVE_SPEED_PERCENT as usize, scale) as i32;
+            sim.add_buff(caster, &swiftness);
         }
 
         Element::Water => {
@@ -188,9 +188,7 @@ pub fn proc_heal(caster_stat: &StatV1, element: Element, scale: usize) -> usize 
 
 /// Basic attacks Harmonic Convergence is worth.
 pub fn convergence_attacks() -> usize {
-    // Rate rather than interval, so the division rounds once at the end
-    // instead of once per attack.
-    (CONVERGENCE_DURATION * CONVERGENCE_ATTACK_SPEED_PERCENT) / (ATTACK_COOLTIME * 100)
+    CONVERGENCE_DURATION / ATTACK_COOLTIME
 }
 
 /// Heals over the whole of Harmonic Convergence.
@@ -212,12 +210,13 @@ pub fn off_element_attack_damage(caster_stat: &StatV1) -> (usize, usize) {
 }
 
 pub fn water_heal(missing_hp: usize, scale: usize) -> usize {
-    percent_of(percent_of(missing_hp, WATER_MISSING_HP_PERCENT), scale)
+    percent_of(
+        WATER_HEAL_FLAT + percent_of(missing_hp, WATER_MISSING_HP_PERCENT),
+        scale,
+    )
 }
 
 pub fn burn_tick_damage(caster_stat: &StatV1, scale: usize) -> usize {
-    let total = BURN_DAMAGE
-        + percent_of(caster_stat.attack, BURN_AD_RATIO)
-        + percent_of(caster_stat.magic_power, BURN_AP_RATIO);
+    let total = BURN_DAMAGE + percent_of(caster_stat.magic_power, BURN_AP_RATIO);
     percent_of(total / BURN_TICKS, scale)
 }
