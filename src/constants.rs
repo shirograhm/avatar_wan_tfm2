@@ -33,7 +33,7 @@ pub const EARTH_RADIUS: u64 = 40_000;
 pub const EARTH_SPLASH_VFX_BUFF: &str = "wan_earth_splash";
 pub const EARTH_SPLASH_VFX_TICKS: usize = 36;
 
-pub const BURN_DAMAGE: usize = 9;
+pub const BURN_DAMAGE: usize = 12;
 pub const BURN_AP_RATIO: usize = 30;
 pub const BURN_TICKS: usize = 6;
 pub const BURN_TICK_INTERVAL: usize = 30;
@@ -59,7 +59,7 @@ pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
 pub const CONVERGENCE_DURATION: usize = ticks!(6.0) as usize;
 /// Matches the buff's base duration; takedown extensions lengthen both.
 pub const CONVERGENCE_SHIELD_DURATION: usize = ticks!(6.0) as usize;
-pub const CONVERGENCE_SHIELD: usize = 200;
+pub const CONVERGENCE_SHIELD: usize = 300;
 pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 60;
 pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 6;
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
