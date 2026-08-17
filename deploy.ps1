@@ -18,7 +18,9 @@ $modId = Split-Path -Leaf $repo
 # --- what gets deployed -----------------------------------------------------
 # Files and folders, relative to the repo. Folders are copied whole, minus the
 # extensions in $ExcludeExtensions below. Everything not named here — src,
-# target, README, Cargo files, .git, .vscode — stays out of the game folder.
+# target, art_src, tools, previews, README, workshop.md, preview.png, Cargo
+# files, .git, .vscode — stays out of the game folder. preview.png and
+# workshop.md are Workshop listing material, uploaded rather than deployed.
 $Include = @(
     "mod.mod_info",
     "mod.override_info",
@@ -29,7 +31,10 @@ $Include = @(
     "effects",
     "icons",
     "style",
-    "text"
+    "text",
+    "better_mod_menu_profile.json",
+    "profile_icon.png",
+    "thumbnail.png"
 )
 
 # Editable source that the engine never reads. `.aseprite` is deliberately not

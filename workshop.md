@@ -1,6 +1,6 @@
 Adds Avatar Wan, the first Avatar, as a draftable champion to Teamfight Manager 2.
 
-[b]Wan comes with his own sprite, skill icons, projectiles, and per-element effects. No extra setup required; just enable the mod.[/b]
+[b]Wan comes with his own sprite, skill icons, projectiles, and per-element effects. Some animations are still WIP.[/b]
 
 [h1] Kit [/h1]
 
