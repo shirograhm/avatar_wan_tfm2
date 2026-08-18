@@ -24,6 +24,7 @@ $modId = Split-Path -Leaf $repo
 $Include = @(
     "mod.mod_info",
     "mod.override_info",
+    "mod.workshop_id",
     "LICENSE",
     "$modId.dll",
     "aseprite_resources",

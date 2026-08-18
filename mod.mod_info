@@ -2,9 +2,9 @@
   "mod_id": "avatar_wan_tfm2",
   "name": "Avatar Wan",
   "author": "shirograhm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds Wan, the first Avatar, as a playable champion.",
-  "last_updated": "2026-08-11",
+  "last_updated": "2026-08-17",
   "dependencies": [
     {
       "mod_id": "base",
