@@ -1,6 +1,6 @@
 Adds Avatar Wan, the first Avatar, as a draftable champion to Teamfight Manager 2.
 
-[b]Wan comes with his own sprite, skill icons, projectiles, and per-element effects. Some animations are still WIP.[/b]
+[b]Wan comes with his own sprite, skill icons, projectiles, and per-element effects. Some animations as well as the SFX are still WIP.[/b]
 
 [h1] Kit [/h1]
 [b]Soul of Raava[/b] (Basic Attack)

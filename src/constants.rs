@@ -52,6 +52,11 @@ pub const STEP_HEAL_PERCENT: usize = 80;
 pub const STEP_HEAL_FLAT: usize = 30;
 pub const STEP_STORE_PREFIX: &str = "wan_step_store";
 pub const STEP_DASH_DISTANCE: u64 = 60_000;
+/// The burst that plays when the window closes and the banked damage is paid
+/// back as health. Timed to the length of the animation - 6 frames at 0.06s -
+/// so the buff carrying it ends with its last frame instead of looping.
+pub const STEP_HEAL_VFX_BUFF: &str = "wan_spirit_step_heal";
+pub const STEP_HEAL_VFX_TICKS: usize = 22;
 pub const STEP_DASH_TICKS: usize = 20;
 
 // ------------------------------------------------ Harmonic Convergence

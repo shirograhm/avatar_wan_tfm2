@@ -153,6 +153,10 @@ impl StableMatchHook for WanDamageStore {
                 let heal = STEP_HEAL_FLAT + percent_of(p.banked, STEP_HEAL_PERCENT);
                 if heal > 0 {
                     sim.heal(p.entity, p.entity, heal);
+                    sim.add_buff(
+                        p.entity,
+                        &BuffV1::timed(STEP_HEAL_VFX_BUFF, STEP_HEAL_VFX_TICKS),
+                    );
                 }
             }
         }

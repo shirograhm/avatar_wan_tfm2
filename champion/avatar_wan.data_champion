@@ -256,6 +256,20 @@
     },
     {
       "type": "Animated",
+      "name": "wan_spirit_step",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_spirit_step_aura",
+      "tag": "aura",
+      "z": 1
+    },
+    {
+      "type": "Animated",
+      "name": "wan_spirit_step_heal",
+      "anim": "asset/avatar_wan_tfm2/effects/wan_spirit_step_heal",
+      "tag": "heal",
+      "z": 1
+    },
+    {
+      "type": "Animated",
       "name": "wan_harmonic_convergence",
       "anim": "asset/avatar_wan_tfm2/effects/wan_ult_area",
       "tag": "area",
