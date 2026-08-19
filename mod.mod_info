@@ -3,8 +3,8 @@
   "name": "Avatar Wan",
   "author": "shirograhm",
   "version": "0.1.1",
-  "description": "Adds Wan, the first Avatar, as a playable champion.",
-  "last_updated": "2026-08-17",
+  "description": "Adds Wan, the first Avatar, as a draftable champion.",
+  "last_updated": "2026-08-18",
   "dependencies": [
     {
       "mod_id": "base",
