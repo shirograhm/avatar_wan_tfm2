@@ -3,6 +3,8 @@ use crate::element::Element;
 // ------------------------------------------------ Defaults
 pub const MOD_ID: &str = "avatar_wan_tfm2";
 pub const CHAMPION_KEY: &str = "avatar_wan";
+
+pub const MAP_SIZE: u64 = 960_000;
 pub const TICKS_PER_SECOND: f64 = 60.0;
 macro_rules! ticks {
     ($num:expr) => {
@@ -42,9 +44,8 @@ pub const BURN_VFX_TICKS: usize = BURN_TICKS * BURN_TICK_INTERVAL;
 
 // ------------------------------------------------ Spirit Step
 pub const STEP_BUFF: &str = "wan_spirit_step";
+// 500 AD * 0.03% = 15% AS
 pub const STEP_ATTACK_SPEED_PERCENT: i32 = 10;
-/// Attack speed on top of the flat bonus, as a percent of AD — 0.03% attack
-/// speed per point, so 500 AD is worth another 15%.
 pub const STEP_ATTACK_SPEED_AD_RATIO: usize = 3;
 pub const STEP_BUFF_DURATION: usize = ticks!(3.0) as usize;
 pub const STEP_STORE_PERCENT: usize = 80;
@@ -52,9 +53,6 @@ pub const STEP_HEAL_PERCENT: usize = 80;
 pub const STEP_HEAL_FLAT: usize = 30;
 pub const STEP_STORE_PREFIX: &str = "wan_step_store";
 pub const STEP_DASH_DISTANCE: u64 = 60_000;
-/// The burst that plays when the window closes and the banked damage is paid
-/// back as health. Timed to the length of the animation - 6 frames at 0.06s -
-/// so the buff carrying it ends with its last frame instead of looping.
 pub const STEP_HEAL_VFX_BUFF: &str = "wan_spirit_step_heal";
 pub const STEP_HEAL_VFX_TICKS: usize = 22;
 pub const STEP_DASH_TICKS: usize = 20;
@@ -62,17 +60,28 @@ pub const STEP_DASH_TICKS: usize = 20;
 // ------------------------------------------------ Harmonic Convergence
 pub const CONVERGENCE_BUFF: &str = "wan_harmonic_convergence";
 pub const CONVERGENCE_DURATION: usize = ticks!(6.0) as usize;
-/// Matches the buff's base duration; takedown extensions lengthen both.
+// Matches the buff's base duration; takedown extensions lengthen both.
 pub const CONVERGENCE_SHIELD_DURATION: usize = ticks!(6.0) as usize;
 pub const CONVERGENCE_SHIELD: usize = 300;
 pub const CONVERGENCE_SHIELD_AP_RATIO: usize = 60;
 pub const CONVERGENCE_SHIELD_HP_RATIO: usize = 6;
 pub const CONVERGENCE_BASE_SCALE: usize = 100;
-/// Duration each takedown — a kill or an assist — adds to an active ult.
+// Duration each takedown — a kill or an assist — adds to an active ult.
 pub const CONVERGENCE_TAKEDOWN_EXTENSION: usize = ticks!(1.5) as usize;
 // How hurt to assume he is when valuing Water's heal — used by the basic
 // attack and by the ult, since neither can read current HP.
 pub const EXPECTED_MISSING_HP_PERCENT: usize = 25;
+
+// ------------------------------------------------ Aggression
+pub const ATTACK_RANGE: u64 = 70_000;
+pub const AGGRO_ENGAGE_RANGE: u64 = 82_000;
+pub const AGGRO_COMBAT_RANGE: u64 = 90_000;
+pub const AGGRO_LOW_HP: usize = 50;
+pub const AGGRO_HP_FLOOR: usize = 50;
+pub const AGGRO_COMMITTED_HP_FLOOR: usize = 25;
+pub const AGGRO_ULT_HP_FLOOR: usize = 12;
+pub const AGGRO_ULT_ENGAGE_RANGE: u64 = 95_000;
+pub const AGGRO_ULT_FOCUS_HP: usize = 40;
 
 pub fn percent_of(value: usize, percent: usize) -> usize {
     (value * percent) / 100

@@ -4,6 +4,7 @@ mod constants;
 mod effects;
 mod element;
 mod match_hook;
+mod player_ai;
 mod util;
 
 use constants::MOD_ID;
@@ -25,6 +26,10 @@ fn init(host: &StableHost) -> StableMod {
     reg.add_native_effect(effects::FIRE_BURN_TICK, effects::FireBurnTick);
 
     reg.set_match_hook(match_hook::WanDamageStore);
+
+    // Keeps him in fights his kit is built to win. `matches` limits it to
+    // Wan's own athletes, so no other champion's AI is touched.
+    reg.add_player_input_ai(player_ai::AggressiveWan);
 
     reg
 }

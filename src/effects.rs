@@ -13,9 +13,6 @@ fn stat_of(sim: &StableSim<'_>, entity: usize) -> StatV1 {
         .map_or(StatV1::default(), |entity| entity.stat())
 }
 
-// ------------------------------------------------ basic attack: Soul of Raava
-/// `None` is the shot fired during Harmonic Convergence, which procs all four
-/// elements rather than one.
 pub struct SoulOfRaava(pub Option<Element>);
 
 pub const ATTACK_HITS: [(&str, Option<Element>); 5] = [
@@ -23,9 +20,6 @@ pub const ATTACK_HITS: [(&str, Option<Element>); 5] = [
     ("avatar_wan_attack_hit_water", Some(Element::Water)),
     ("avatar_wan_attack_hit_earth", Some(Element::Earth)),
     ("avatar_wan_attack_hit_fire", Some(Element::Fire)),
-    // Exists so the ult's branch of the .data_champion can carry its own
-    // projectile — and so `expected_damage` can price that shot as all four
-    // procs instead of one.
     ("avatar_wan_attack_hit_convergence", None),
 ];
 
@@ -44,9 +38,6 @@ impl StableEffectType for SoulOfRaava {
 
         let stat = stat_of(sim, caster_id);
         let converged = element::has_buff(sim, caster_id, CONVERGENCE_BUFF);
-        // A converged shot has no single element. It only reaches the branch
-        // below if the buff fell off mid-flight, in which case the starting
-        // element is as good a guess as any.
         let launched = self.0.unwrap_or(STARTING_ELEMENT);
 
         if element::current(sim, caster_id).is_none() {
@@ -84,11 +75,6 @@ impl StableEffectType for SoulOfRaava {
         }
     }
 
-    /// The attack itself plus whatever the element riding it is worth.
-    ///
-    /// Which instance the AI asks is the answer to "which element": the
-    /// .data_champion's `SwitchByBuff` chain picks the one matching his
-    /// attunement, so `self.0` is always the element this shot will proc.
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
         let (physical, magic) = match self.0 {
             Some(element) => element::proc_damage(caster_stat, element, CONVERGENCE_BASE_SCALE),
@@ -101,7 +87,6 @@ impl StableEffectType for SoulOfRaava {
         )
     }
 
-    /// Water's proc, on the attacks that carry it.
     fn expected_heal(&self, caster_stat: &StatV1) -> usize {
         element::proc_heal(
             caster_stat,
@@ -139,7 +124,6 @@ impl StableEffectType for FireBurnTick {
     }
 }
 
-// ------------------------------------------------------- skill: The Avatar Cycle
 pub struct TheAvatarCycle;
 
 impl StableEffectType for TheAvatarCycle {
@@ -165,7 +149,6 @@ impl StableEffectType for TheAvatarCycle {
     }
 }
 
-// ------------------------------------------------------- skill2: Spirit Step
 pub struct SpiritStep;
 
 impl SpiritStep {
@@ -217,11 +200,8 @@ impl StableEffectType for SpiritStep {
     }
 }
 
-// ------------------------------------------------- ult: Harmonic Convergence
 pub struct HarmonicConvergence;
 
-/// The ult buff with an explicit duration, so takedowns can re-add it with
-/// time left over instead of rebuilding the stat block by hand.
 pub fn convergence_buff(ticks: usize) -> BuffV1 {
     BuffV1::timed(CONVERGENCE_BUFF, ticks)
 }

@@ -35,9 +35,6 @@ struct Pending {
     open: bool,
 }
 
-/// Wan is attuned from the moment he is on the field, so the element overlay
-/// is never blank. Runs every tick rather than only at match start so a
-/// respawn, which drops his buffs, re-attunes him too.
 fn attune_unattuned(sim: &mut StableSim<'_>) {
     let unattuned: Vec<usize> = (0..sim.entity_count())
         .filter_map(|index| sim.entity_at(index))
@@ -54,10 +51,6 @@ fn attune_unattuned(sim: &mut StableSim<'_>) {
     }
 }
 
-/// Takedowns — kills and assists alike — the given player was credited with on
-/// the previous tick. Reading the tick just gone rather than the current one
-/// means each kill is counted exactly once no matter whether the host appends
-/// to the log before or after this hook runs.
 fn takedowns_last_tick(sim: &StableSim<'_>, team: usize, lane: u32) -> usize {
     let Some(previous) = sim.tick().checked_sub(1) else {
         return 0;
@@ -80,9 +73,6 @@ fn convergence_remaining(entity: &StableEntity<'_, '_>) -> Option<usize> {
         .map(|buff| buff.duration_tick)
 }
 
-/// A takedown while Harmonic Convergence is up buys Wan more of it. The buff
-/// carries no per-cast state, so the extension is a remove-and-re-add with the
-/// leftover duration rolled in.
 fn extend_convergence_on_takedown(sim: &mut StableSim<'_>) {
     let mut extended: Vec<(usize, usize, usize)> = Vec::new();
 
@@ -96,7 +86,8 @@ fn extend_convergence_on_takedown(sim: &mut StableSim<'_>) {
         if !champion.is_alive() || !crate::element::is_wan(&champion) {
             continue;
         }
-        let (Some(lane), Some(remaining)) = (player.lane(), convergence_remaining(&champion)) else {
+        let (Some(lane), Some(remaining)) = (player.lane(), convergence_remaining(&champion))
+        else {
             continue;
         };
 
@@ -107,10 +98,6 @@ fn extend_convergence_on_takedown(sim: &mut StableSim<'_>) {
         }
     }
 
-    // The shield rides the same clock, so it is rebuilt alongside the buff:
-    // whatever is left of it is re-granted for the new duration. Layers are not
-    // individually addressable, so this sweeps up any other shield on him too —
-    // in practice the ult's is the only one Wan carries.
     for (entity, duration, shield) in extended {
         sim.entity_remove_buff(entity, CONVERGENCE_BUFF);
         sim.add_buff(entity, &crate::effects::convergence_buff(duration));
